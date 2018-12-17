@@ -23,4 +23,15 @@ attr_reader :games,
     game_teams = CSV.readlines(locations[:game_teams])
     StatTracker.new(games, teams, game_teams)
   end
+
+  def highest_total_score
+    highest_score  = 0
+    games.each do |game|
+      current_score = game[6].to_i + game[7].to_i
+        if current_score > highest_score
+          highest_score = current_score
+        end
+    end
+    highest_score
+  end
 end
