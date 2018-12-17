@@ -1,17 +1,27 @@
 require 'csv'
+require 'pry'
 class StatTracker
+attr_reader :games,
+            :teams,
+            :game_teams
+  def initialize(games, teams, game_teams)
+    @games = games
+    @teams = teams
+    @game_teams = game_teams
+  end
+
   def self.from_csv_test(locations)
-    csv = []
-    csv << CSV.readlines(locations[:games])[1, 100]
-    csv << CSV.readlines(locations[:teams])[1, 100]
-    csv << CSV.readlines(locations[:game_teams])[1, 100]
+    games = CSV.readlines(locations[:games])[1, 100]
+    teams = CSV.readlines(locations[:teams])[1, 100]
+    game_teams = CSV.readlines(locations[:game_teams])[1, 100]
+    StatTracker.new(games, teams, game_teams)
   end
 
   def self.from_csv(locations)
-    csv = []
-    csv << CSV.readlines(locations[:games])
-    csv << CSV.readlines(locations[:teams])
-    csv << CSV.readlines(locations[:game_teams])
+    games = CSV.readlines(locations[:games])
+    teams = CSV.readlines(locations[:teams])
+    game_teams = CSV.readlines(locations[:game_teams])
+    StatTracker.new(games, teams, game_teams)
   end
 end
 
@@ -26,5 +36,4 @@ locations = {
 }
 
 stat_tracker = StatTracker.from_csv_test(locations)
-
-require 'pry'; binding.pry
+stat_tracker.from_csv_test
