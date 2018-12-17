@@ -20,4 +20,10 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv_test(@locations)
     assert_instance_of StatTracker, stat_tracker
   end
+
+  def test_it_can_determine_most_popular_venue
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "United Center", stat_tracker.most_popular_venue
+  end
 end
