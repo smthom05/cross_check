@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'minitest/pride'
 require 'simplecov'
 require './lib/stat_tracker'
 SimpleCov.start
