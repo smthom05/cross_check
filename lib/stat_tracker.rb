@@ -1,6 +1,7 @@
 require 'csv'
 require './lib/game'
 require './lib/game_teams'
+require './lib/team'
 
 class StatTracker
   attr_reader :games,
@@ -13,25 +14,29 @@ class StatTracker
   end
 
   def self.from_csv_test(locations)
-    games = CSV.readlines(locations[:games])[1, 100]
-    teams = CSV.readlines(locations[:teams])[1, 100]
-    game_teams = CSV.readlines(locations[:game_teams])[1, 100]
-    all_games = []
-    all_game_teams = []
-    games.each do |game|
-      all_games << Game.new(game)
+    all_games = CSV.readlines(locations[:games])[1, 100].map do |game|
+      Game.new(game)
     end
-    game_teams.each do |game|
-      all_game_teams << GameTeams.new(game)
+    all_game_teams = CSV.readlines(locations[:game_teams])[1, 100].map do |game|
+      GameTeams.new(game)
     end
-    StatTracker.new(all_games, teams, all_game_teams)
+    all_teams = CSV.readlines(locations[:teams])[1, 100].map do |team|
+      Team.new(team)
+    end
+    StatTracker.new(all_games, all_teams, all_game_teams)
   end
 
   def self.from_csv(locations)
-    games = CSV.readlines(locations[:games])[1..-1]
-    teams = CSV.readlines(locations[:teams])[1..-1]
-    game_teams = CSV.readlines(locations[:game_teams])[1..-1]
-    StatTracker.new(games, teams, game_teams)
+    all_games = CSV.readlines(locations[:games])[1, -1].map do |game|
+      Game.new(game)
+    end
+    all_game_teams = CSV.readlines(locations[:game_teams])[1, -1].map do |game|
+      GameTeams.new(game)
+    end
+    all_teams = CSV.readlines(locations[:teams])[1, -1].map do |team|
+      Team.new(team)
+    end
+    StatTracker.new(all_games, all_teams, all_game_teams)
   end
 
 
