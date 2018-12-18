@@ -70,7 +70,7 @@ class StatTracker
   def highest_total_score
     highest_score = 0
     games.each do |game|
-      current_score = game.away_goals.to_i + game.home_goals.to_i
+      current_score = game.away_goals + game.home_goals
         if current_score > highest_score
           highest_score = current_score
         end
@@ -81,7 +81,7 @@ class StatTracker
   def lowest_total_score
     lowest_score = 0
     games.each do |game|
-      current_score = game.away_goals.to_i + game.home_goals.to_i
+      current_score = game.away_goals + game.home_goals
         if current_score < lowest_score
           lowest_score = current_score
         end
@@ -140,7 +140,7 @@ class StatTracker
   def average_goals_per_game
     goals_per_game = []
     @games.each do |game|
-      goals_per_game << (game.away_goals.to_i + game.home_goals.to_i)
+      goals_per_game << (game.away_goals + game.home_goals)
     end
     goals_per_game.sum.to_f / goals_per_game.count.to_f
   end
@@ -148,7 +148,7 @@ class StatTracker
   def average_goals_by_season
     goals_by_season = Hash.new([])
     @games.each do |game|
-      goals_by_season[game.season] += [game.away_goals.to_i + game.home_goals.to_i]
+      goals_by_season[game.season] += [game.away_goals + game.home_goals]
     end
     goals_by_season.each do |season_id, goals|
       goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f)

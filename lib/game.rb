@@ -21,8 +21,8 @@ class Game
     @date_time = attribute_array[3]
     @away_team_id = attribute_array[4]
     @home_team_id = attribute_array[5]
-    @away_goals = attribute_array[6]
-    @home_goals = attribute_array[7]
+    @away_goals = attribute_array[6].to_i
+    @home_goals = attribute_array[7].to_i
     @outcome = attribute_array[8]
     @home_rink_side_start = attribute_array[9]
     @venue = attribute_array[10]
