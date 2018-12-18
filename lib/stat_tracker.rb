@@ -25,7 +25,7 @@ attr_reader :games,
   end
 
   def highest_total_score
-    highest_score  = 0
+    highest_score = 0
     games.each do |game|
       current_score = game[6].to_i + game[7].to_i
         if current_score > highest_score
@@ -33,5 +33,16 @@ attr_reader :games,
         end
     end
     highest_score
+  end
+
+  def lowest_total_score
+    lowest_score = 0
+    games.each do |game|
+      current_score = game[6].to_i + game[7].to_i
+        if current_score < lowest_score
+          lowest_score = current_score
+        end
+    end
+    lowest_score
   end
 end
