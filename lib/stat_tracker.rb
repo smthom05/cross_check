@@ -1,5 +1,6 @@
 require 'csv'
 require './lib/game'
+require './lib/game_teams'
 
 
 class StatTracker
@@ -17,10 +18,14 @@ class StatTracker
     teams = CSV.readlines(locations[:teams])[1, 100]
     game_teams = CSV.readlines(locations[:game_teams])[1, 100]
     all_games = []
+    all_game_teams = []
     games.each do |game|
       all_games << Game.new(game)
     end
-    StatTracker.new(all_games, teams, game_teams)
+    game_teams.each do |game|
+      all_game_teams << GameTeams.new(game)
+    end
+    StatTracker.new(all_games, teams, all_game_teams)
   end
 
   def self.from_csv(locations)
@@ -113,9 +118,9 @@ class StatTracker
     home_games = []
     home_wins = []
     @game_teams.each do |game|
-      if game[2] == "home"
+      if game.hoa == "home"
         home_games << game
-        if game[3] == "TRUE"
+        if game.won == "TRUE"
           home_wins << game
         end
       end
@@ -127,9 +132,9 @@ class StatTracker
     visitor_games = []
     visitor_wins = []
     @game_teams.each do |game|
-      if game[2] == "away"
+      if game.hoa == "away"
         visitor_games << game
-        if game[3] == "TRUE"
+        if game.won == "TRUE"
           visitor_wins << game
         end
       end
