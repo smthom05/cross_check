@@ -42,4 +42,14 @@ attr_reader :games,
     end
     venues.min_by {|venue| venues.count(venue)}
   end
+
+  #method to find season with most games played
+  def season_with_most_games
+    seasons = []
+    @games.each do |game|
+      seasons << game[1]
+    end
+    (seasons.max_by {|season| seasons.count(season)}).to_i
+  end
+
 end

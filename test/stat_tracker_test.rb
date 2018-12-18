@@ -32,4 +32,10 @@ class StatTrackerTest < Minitest::Test
 
     assert_equal "Scotiabank Place", stat_tracker.least_popular_venue
   end
+
+  def test_it_can_determine_season_with_most_games
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal 20122013, stat_tracker.season_with_most_games
+  end
 end
