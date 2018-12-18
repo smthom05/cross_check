@@ -42,4 +42,11 @@ class StatTrackerTest < Minitest::Test
     assert_instance_of Integer, stat_tracker.biggest_blowout
     assert_equal 5, stat_tracker.biggest_blowout
   end
+
+  def test_it_knows_games_by_season
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_instance_of Hash, stat_tracker.count_of_games_by_season
+    assert_equal ({"20122013"=>57, "20162017"=>4, "20142015"=>17, "20152016"=>16, "20132014"=>6}), stat_tracker.count_of_games_by_season
+  end
 end

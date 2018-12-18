@@ -18,9 +18,9 @@ attr_reader :games,
   end
 
   def self.from_csv(locations)
-    games = CSV.readlines(locations[:games])
-    teams = CSV.readlines(locations[:teams])
-    game_teams = CSV.readlines(locations[:game_teams])
+    games = CSV.readlines(locations[:games])[1..-1]
+    teams = CSV.readlines(locations[:teams])[1..-1]
+    game_teams = CSV.readlines(locations[:game_teams])[1..-1]
     StatTracker.new(games, teams, game_teams)
   end
 
@@ -49,11 +49,21 @@ attr_reader :games,
   def biggest_blowout
     blowout = 0
     games.each do |game|
-      score_difference = (game[6].to_i..game[7].to_i).to_a.count - 1
+      score_difference = (game[6]..game[7]).to_a.count - 1
         if score_difference > blowout
           blowout = score_difference
         end
     end
     blowout
+  end
+
+  def count_of_games_by_season
+    seasons_hash = @games.group_by do |game|
+      game[1]
+    end
+
+    seasons_hash.each do |season, value|
+      seasons_hash[season] = value.count
+    end
   end
 end
