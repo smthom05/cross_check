@@ -19,9 +19,9 @@ attr_reader :games,
   end
 
   def self.from_csv(locations)
-    games = CSV.readlines(locations[:games])
-    teams = CSV.readlines(locations[:teams])
-    game_teams = CSV.readlines(locations[:game_teams])
+    games = CSV.readlines(locations[:games])[1..-1]
+    teams = CSV.readlines(locations[:teams])[1..-1]
+    game_teams = CSV.readlines(locations[:game_teams])[1..-1]
     StatTracker.new(games, teams, game_teams)
   end
 
@@ -50,6 +50,15 @@ attr_reader :games,
       seasons << game[1]
     end
     (seasons.max_by {|season| seasons.count(season)}).to_i
+  end
+
+  #method to find season with fewest games played
+  def season_with_fewest_games
+    seasons = []
+    @games.each do |game|
+      seasons << game[1]
+    end
+    season_l = (seasons.min_by {|season| seasons.count(season)}).to_i
   end
 
 end

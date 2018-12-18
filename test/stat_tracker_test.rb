@@ -36,6 +36,14 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_season_with_most_games
     stat_tracker = StatTracker.from_csv_test(@locations)
 
+    #full csv gives back 20172018
     assert_equal 20122013, stat_tracker.season_with_most_games
+  end
+
+  def test_it_can_determine_season_with_fewest_games
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    #full csv gives back 20122013
+    assert_equal 20162017, stat_tracker.season_with_fewest_games
   end
 end
