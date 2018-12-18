@@ -27,13 +27,13 @@ class StatTracker
   end
 
   def self.from_csv(locations)
-    all_games = CSV.readlines(locations[:games])[1, -1].map do |game|
+    all_games = CSV.readlines(locations[:games])[1..-1].map do |game|
       Game.new(game)
     end
-    all_game_teams = CSV.readlines(locations[:game_teams])[1, -1].map do |game|
+    all_game_teams = CSV.readlines(locations[:game_teams])[1..-1].map do |game|
       GameTeams.new(game)
     end
-    all_teams = CSV.readlines(locations[:teams])[1, -1].map do |team|
+    all_teams = CSV.readlines(locations[:teams])[1..-1].map do |team|
       Team.new(team)
     end
     StatTracker.new(all_games, all_teams, all_game_teams)
@@ -163,5 +163,41 @@ class StatTracker
       goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f)
     end
     goals_by_season
+  end
+
+  def highest_scoring_home_team
+    team_scores_by_id = Hash.new
+
+    teams.each do |team|
+      team_scores_by_id[team.team_id] = 0
+    end
+    team_scores_by_id
+
+    game_teams.each do |game|
+      if game.hoa == "home"
+        team_scores_by_id[game.team_id] += game.goals
+      end
+    end
+
+    team_scores_by_id
+    highest_score = 0
+    team_scores_by_id.each do |_, score|
+      if score > highest_score
+        highest_score = score
+      end
+    end
+    highest_score
+    best_home_id = "0"
+    team_scores_by_id.each do |id, score|
+      if score == highest_score
+        best_home_id = id
+      end
+    end
+    best_home_id
+    teams.each do |team|
+      if best_home_id == team.team_id
+        return team.team_name
+      end
+    end 
   end
 end

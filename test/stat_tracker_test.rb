@@ -105,5 +105,15 @@ class StatTrackerTest < Minitest::Test
     assert_equal true, stat_tracker.game_teams[1].won?
   end
 
+  def test_it_knows_highest_scoring_home_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
 
+    assert_equal "Blackhawks", stat_tracker.highest_scoring_home_team
+  end
+
+  def test_it_knows_lowest_scoring_home_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Blackhawks", stat_tracker.lowest_scoring_home_team 
+  end
 end
