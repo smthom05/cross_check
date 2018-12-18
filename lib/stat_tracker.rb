@@ -45,4 +45,15 @@ attr_reader :games,
     end
     lowest_score
   end
+
+  def biggest_blowout
+    blowout = 0
+    games.each do |game|
+      score_difference = (game[6].to_i..game[7].to_i).to_a.count - 1
+        if score_difference > blowout
+          blowout = score_difference
+        end
+    end
+    blowout
+  end
 end

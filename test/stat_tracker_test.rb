@@ -35,4 +35,11 @@ class StatTrackerTest < Minitest::Test
     assert_instance_of Integer, stat_tracker.lowest_total_score
     assert_equal 0, stat_tracker.lowest_total_score
   end
+
+  def test_it_knows_biggest_blowout
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_instance_of Integer, stat_tracker.biggest_blowout
+    assert_equal 5, stat_tracker.biggest_blowout
+  end
 end
