@@ -1,6 +1,7 @@
 require 'csv'
 require './lib/game'
 
+
 class StatTracker
   attr_reader :games,
               :teams,
@@ -27,6 +28,43 @@ class StatTracker
     teams = CSV.readlines(locations[:teams])[1..-1]
     game_teams = CSV.readlines(locations[:game_teams])[1..-1]
     StatTracker.new(games, teams, game_teams)
+  end
+
+
+  # method to find venue with most games played
+  def most_popular_venue
+    venues = []
+    @games.each do |game|
+      venues << game[10]
+    end
+    venues.max_by {|venue| venues.count(venue)}
+  end
+
+  # method to find venue with least games played
+  def least_popular_venue
+    venues = []
+    @games.each do |game|
+      venues << game[10]
+    end
+    venues.min_by {|venue| venues.count(venue)}
+  end
+
+  #method to find season with most games played
+  def season_with_most_games
+    seasons = []
+    @games.each do |game|
+      seasons << game[1]
+    end
+    (seasons.max_by {|season| seasons.count(season)}).to_i
+  end
+
+  #method to find season with fewest games played
+  def season_with_fewest_games
+    seasons = []
+    @games.each do |game|
+      seasons << game[1]
+    end
+    season_l = (seasons.min_by {|season| seasons.count(season)}).to_i
   end
 
   def highest_total_score
