@@ -198,6 +198,45 @@ class StatTracker
       if best_home_id == team.team_id
         return team.team_name
       end
-    end 
+    end
+  end
+
+  def lowest_scoring_home_team
+    teams_games_by_id = Hash.new 
+    team_scores_by_id = Hash.new
+
+    teams.each do |team|
+      team_scores_by_id[team.team_id] = 0
+    end
+    team_scores_by_id
+
+    game_teams.each do |game|
+      if game.hoa == "home"
+        team_scores_by_id[game.team_id] += game.goals
+      end
+    end
+    team_scores_by_id
+    lowest_score = 1000
+
+    team_scores_by_id.each do |_, score|
+      if score < lowest_score && score != 0
+        lowest_score = score
+      end
+    end
+    lowest_score
+
+    worst_home_id = "0"
+    team_scores_by_id.each do |id, score|
+      if score == lowest_score
+        worst_home_id = id
+      end
+    end
+
+    worst_home_id
+    teams.each do |team|
+      if worst_home_id == team.team_id
+        return team.team_name
+      end
+    end
   end
 end
