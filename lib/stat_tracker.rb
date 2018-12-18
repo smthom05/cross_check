@@ -18,7 +18,7 @@ class StatTracker
     game_teams = CSV.readlines(locations[:game_teams])[1, 100]
     all_games = []
     games.each do |game|
-       all_games << Game.new(game)
+      all_games << Game.new(game)
     end
     StatTracker.new(all_games, teams, game_teams)
   end
@@ -35,7 +35,7 @@ class StatTracker
   def most_popular_venue
     venues = []
     @games.each do |game|
-      venues << game[10]
+      venues << game.venue
     end
     venues.max_by {|venue| venues.count(venue)}
   end
@@ -44,7 +44,7 @@ class StatTracker
   def least_popular_venue
     venues = []
     @games.each do |game|
-      venues << game[10]
+      venues << game.venue
     end
     venues.min_by {|venue| venues.count(venue)}
   end
@@ -53,7 +53,7 @@ class StatTracker
   def season_with_most_games
     seasons = []
     @games.each do |game|
-      seasons << game[1]
+      seasons << game.season
     end
     (seasons.max_by {|season| seasons.count(season)}).to_i
   end
@@ -62,15 +62,15 @@ class StatTracker
   def season_with_fewest_games
     seasons = []
     @games.each do |game|
-      seasons << game[1]
+      seasons << game.season
     end
-    season_l = (seasons.min_by {|season| seasons.count(season)}).to_i
+    (seasons.min_by {|season| seasons.count(season)}).to_i
   end
 
   def highest_total_score
     highest_score = 0
     games.each do |game|
-      current_score = game[6].to_i + game[7].to_i
+      current_score = game.away_goals.to_i + game.home_goals.to_i
         if current_score > highest_score
           highest_score = current_score
         end
@@ -81,7 +81,7 @@ class StatTracker
   def lowest_total_score
     lowest_score = 0
     games.each do |game|
-      current_score = game[6].to_i + game[7].to_i
+      current_score = game.away_goals.to_i + game.home_goals.to_i
         if current_score < lowest_score
           lowest_score = current_score
         end
@@ -92,7 +92,7 @@ class StatTracker
   def biggest_blowout
     blowout = 0
     games.each do |game|
-      score_difference = (game[6]..game[7]).to_a.count - 1
+      score_difference = (game.away_goals..game.home_goals).to_a.count - 1
         if score_difference > blowout
           blowout = score_difference
         end
@@ -102,12 +102,12 @@ class StatTracker
 
   def count_of_games_by_season
     seasons_hash = @games.group_by do |game|
-      game[1]
+      game.season
     end
-
     seasons_hash.each do |season, value|
       seasons_hash[season] = value.count
     end
+  end
 
   def percentage_home_wins
     home_games = []
@@ -154,6 +154,5 @@ class StatTracker
       goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f)
     end
     goals_by_season
-
   end
 end

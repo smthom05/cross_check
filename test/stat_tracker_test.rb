@@ -46,7 +46,8 @@ class StatTrackerTest < Minitest::Test
 
     #full csv gives back 20122013
     assert_equal 20162017, stat_tracker.season_with_fewest_games
-    
+  end
+
   def test_it_knows_highest_total_score
     stat_tracker = StatTracker.from_csv_test(@locations)
 
@@ -73,6 +74,7 @@ class StatTrackerTest < Minitest::Test
 
     assert_instance_of Hash, stat_tracker.count_of_games_by_season
     assert_equal ({"20122013"=>57, "20162017"=>4, "20142015"=>17, "20152016"=>16, "20132014"=>6}), stat_tracker.count_of_games_by_season
+  end
 
   def test_it_can_determine_percentage_home_wins
     stat_tracker = StatTracker.from_csv_test(@locations)
