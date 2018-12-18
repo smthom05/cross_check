@@ -97,4 +97,13 @@ class StatTrackerTest < Minitest::Test
     hash = {"20122013"=>4.912280701754386, "20162017"=>5.75, "20142015"=>4.823529411764706, "20152016"=>4.875, "20132014"=>5.666666666666667}
     assert_equal hash, stat_tracker.average_goals_by_season
   end
+
+  def test_it_knows_wins_and_losses
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal false, stat_tracker.game_teams[0].won?
+    assert_equal true, stat_tracker.game_teams[1].won?
+  end
+
+
 end
