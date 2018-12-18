@@ -59,6 +59,14 @@ attr_reader :games,
       seasons << game[1]
     end
     season_l = (seasons.min_by {|season| seasons.count(season)}).to_i
+
+    # seasons_hash = @games.group_by do |game|
+    #   game[1]
+    # end
+    #   seasons_hash.each do |season, value|
+    #     seasons_hash[season] = value.count
+    # end
+    # seasons_hash
   end
 
 end
