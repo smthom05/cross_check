@@ -1,4 +1,5 @@
 require 'csv'
+require './lib/game'
 
 class StatTracker
   attr_reader :games,
@@ -14,7 +15,11 @@ class StatTracker
     games = CSV.readlines(locations[:games])[1, 100]
     teams = CSV.readlines(locations[:teams])[1, 100]
     game_teams = CSV.readlines(locations[:game_teams])[1, 100]
-    StatTracker.new(games, teams, game_teams)
+    all_games = []
+    games.each do |game|
+       all_games << Game.new(game)
+    end
+    StatTracker.new(all_games, teams, game_teams)
   end
 
   def self.from_csv(locations)
@@ -55,7 +60,7 @@ class StatTracker
   def average_goals_per_game
     goals_per_game = []
     @games.each do |game|
-      goals_per_game << (game[6].to_i + game[7].to_i)
+      goals_per_game << (game.away_goals.to_i + game.home_goals.to_i)
     end
     goals_per_game.sum.to_f / goals_per_game.count.to_f
   end
@@ -63,7 +68,7 @@ class StatTracker
   def average_goals_by_season
     goals_by_season = Hash.new([])
     @games.each do |game|
-      goals_by_season[game[1]] += [game[6].to_i + game[7].to_i]
+      goals_by_season[game.season] += [game.away_goals.to_i + game.home_goals.to_i]
     end
     goals_by_season.each do |season_id, goals|
       goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f)
