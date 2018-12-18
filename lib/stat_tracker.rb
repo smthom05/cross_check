@@ -33,4 +33,13 @@ attr_reader :games,
     end
     venues.max_by {|venue| venues.count(venue)}
   end
+
+  # method to find venue with least games played
+  def least_popular_venue
+    venues = []
+    @games.each do |game|
+      venues << game[10]
+    end
+    venues.min_by {|venue| venues.count(venue)}
+  end
 end

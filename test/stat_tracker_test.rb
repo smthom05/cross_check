@@ -26,4 +26,10 @@ class StatTrackerTest < Minitest::Test
 
     assert_equal "United Center", stat_tracker.most_popular_venue
   end
+
+  def test_it_can_determine_least_popular_venue
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Scotiabank Place", stat_tracker.least_popular_venue
+  end
 end
