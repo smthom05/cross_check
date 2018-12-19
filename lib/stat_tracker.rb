@@ -294,4 +294,80 @@ class StatTracker
     worst_fans.keys
   end
 
+  def biggest_bust(season)
+    teams_and_preseason_games = Hash[@teams.map {|team| [team, 0]}]
+    teams_and_regular_games = Hash[@teams.map {|team| [team, 0]}]
+    teams_and_preseason_wins = Hash[@teams.map {|team| [team, 0]}]
+    teams_and_regular_wins = Hash[@teams.map {|team| [team, 0]}]
+    preseason_games = []
+    regular_games = []
+    @games.each do |game|
+      if game.season == season && game.type == "P"
+        preseason_games << game
+      elsif game.season == season && game.type == "R"
+        regular_games << game
+      end
+    end
+    preseason_game_ids = preseason_games.map do |game|
+      game.game_id
+    end
+    regular_game_ids = regular_games.map do |game|
+      game.game_id
+    end
+
+    preseason_game_teams = []
+    @game_teams.each do |game|
+      if preseason_game_ids.include?(game.game_id)
+        preseason_game_teams << game
+      end
+    end
+    regular_game_teams = []
+    @game_teams.each do |game|
+      if regular_game_ids.include?(game.game_id)
+        regular_game_teams << game
+      end
+    end
+    preseason_game_teams.each do |game|
+      @teams.each do |team|
+        if team.team_id == game.team_id
+          teams_and_preseason_games[team] += 1
+          if game.won == "TRUE"
+            teams_and_preseason_wins[team] += 1
+          end
+        end
+      end
+    end
+    regular_game_teams.each do |game|
+      @teams.each do |team|
+        if team.team_id == game.team_id
+          teams_and_regular_games[team] += 1
+          if game.won == "TRUE"
+            teams_and_regular_wins[team] += 1
+          end
+        end
+      end
+    end
+    preseason_win_percentage = teams_and_preseason_wins.merge(teams_and_preseason_games){|key, old, new| Array(old).push(new)}
+    regular_win_percentage = teams_and_regular_wins.merge(teams_and_regular_games){|key, old, new| Array(old).push(new)}
+    preseason_win_percentage.each do |team, pair|
+      if pair[1] != 0
+        preseason_win_percentage[team] = (pair[0].to_f / pair[1].to_f)
+      else preseason_win_percentage[team] = 0
+      end
+    end
+    regular_win_percentage.each do |team, pair|
+      if pair[1] != 0
+        regular_win_percentage[team] = (pair[0].to_f / pair[1].to_f)
+      else regular_win_percentage[team] = 0
+      end
+    end
+    biggest_bust = regular_win_percentage.merge(preseason_win_percentage){|key, old, new| Array(old).push(new)}
+    biggest_bust.each do |team, pair|
+      if pair[1] != 0 && pair[0] != 0
+        biggest_bust[team] = (pair[0].to_f - pair[1].to_f)
+      else biggest_bust[team] = 0
+      end
+    end
+    biggest_bust.max_by{|team, win_percentage_difference| win_percentage_difference}[0].team_name
+  end
 end
