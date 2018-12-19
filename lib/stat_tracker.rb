@@ -275,7 +275,6 @@ class StatTracker
     worst_defensive_team = teams_avg_goals_against.max_by do |team, gpg_against|
       gpg_against
     end
-    require 'pry'; binding.pry
     worst_defensive_team[0].team_name
   end
 
