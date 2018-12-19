@@ -1,8 +1,9 @@
+require 'simplecov'
+SimpleCov.start
 require 'minitest/autorun'
 require 'minitest/pride'
-require 'simplecov'
 require './lib/stat_tracker'
-SimpleCov.start
+
 
 class StatTrackerTest < Minitest::Test
   def setup
@@ -96,5 +97,10 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv_test(@locations)
     hash = {"20122013"=>4.912280701754386, "20162017"=>5.75, "20142015"=>4.823529411764706, "20152016"=>4.875, "20132014"=>5.666666666666667}
     assert_equal hash, stat_tracker.average_goals_by_season
+  end
+
+  def test_it_can_determine_best_offense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "", stat_tracker.best_offense
   end
 end

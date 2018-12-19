@@ -27,13 +27,13 @@ class StatTracker
   end
 
   def self.from_csv(locations)
-    all_games = CSV.readlines(locations[:games])[1, -1].map do |game|
+    all_games = CSV.readlines(locations[:games])[1..-1].map do |game|
       Game.new(game)
     end
-    all_game_teams = CSV.readlines(locations[:game_teams])[1, -1].map do |game|
+    all_game_teams = CSV.readlines(locations[:game_teams])[1..-1].map do |game|
       GameTeams.new(game)
     end
-    all_teams = CSV.readlines(locations[:teams])[1, -1].map do |team|
+    all_teams = CSV.readlines(locations[:teams])[1..-1].map do |team|
       Team.new(team)
     end
     StatTracker.new(all_games, all_teams, all_game_teams)
@@ -164,4 +164,43 @@ class StatTracker
     end
     goals_by_season
   end
+
+  def best_offense
+    @teams_games = Hash[@teams.map {|team| [team, 0]}]
+    @teams_goals = Hash[@teams.map {|team| [team, 0]}]
+
+      @game_teams.each do |game|
+        @teams_games.each do |team, games|
+        if team.team_id == game.team_id
+          @teams_games[team] += 1
+        else
+          @teams_games[team]
+        end
+      end
+    end
+
+     @game_teams.each do |game|
+       @teams_goals.each do |team, goals|
+         if team.team_id == game.team_id
+           @teams_goals[team] += game.goals.to_f
+         else
+           @teams_goals[team]
+        end
+       end
+     end
+
+     teams_avg_goals = @teams_goals.merge(@teams_games){|key, old, new| Array(old).push(new) }
+     teams_avg_goals.each do |a, b|
+       teams_avg_goals[a] = b[0].to_f / b[1].to_f
+     end
+     best_gpg = ''
+     teams_avg_goals.values.each do |value|
+       if value.class == Float
+         require 'pry'; binding.pry
+         best_gpg = teams_avg_goals.max
+       end
+     end
+     best_gpg
+  end
+
 end
