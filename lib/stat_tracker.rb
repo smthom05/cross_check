@@ -193,11 +193,10 @@ class StatTracker
      teams_avg_goals.each do |a, b|
        teams_avg_goals[a] = b[0].to_f / b[1].to_f
      end
-     best_gpg = ''
+     best_gpg = 0.0
      teams_avg_goals.values.each do |value|
-       if value.class == Float
-         require 'pry'; binding.pry
-         best_gpg = teams_avg_goals.max
+       if value > best_gpg
+         best_gpg = value
        end
      end
      best_gpg

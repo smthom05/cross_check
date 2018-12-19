@@ -101,6 +101,6 @@ class StatTrackerTest < Minitest::Test
 
   def test_it_can_determine_best_offense
     stat_tracker = StatTracker.from_csv(@locations)
-    assert_equal "", stat_tracker.best_offense
+    assert_equal "Las Vegas Golden Knights", stat_tracker.best_offense
   end
 end
