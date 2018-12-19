@@ -101,6 +101,12 @@ class StatTrackerTest < Minitest::Test
     assert_equal hash, stat_tracker.average_goals_by_season
   end
 
+
+  def test_it_can_determine_best_offense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "Las Vegas Golden Knights", stat_tracker.best_offense
+  end
+
   def test_it_can_count_teams
     stat_tracker = StatTracker.from_csv(@locations)
 

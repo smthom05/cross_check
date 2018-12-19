@@ -152,6 +152,45 @@ class StatTracker
     goals_by_season
   end
 
+
+  def best_offense
+    @teams_games = Hash[@teams.map {|team| [team, 0]}]
+    @teams_goals = Hash[@teams.map {|team| [team, 0]}]
+
+      @game_teams.each do |game|
+        @teams_games.each do |team, games|
+        if team.team_id == game.team_id
+          @teams_games[team] += 1
+        else
+          @teams_games[team]
+        end
+      end
+    end
+
+     @game_teams.each do |game|
+       @teams_goals.each do |team, goals|
+         if team.team_id == game.team_id
+           @teams_goals[team] += game.goals.to_f
+         else
+           @teams_goals[team]
+        end
+       end
+     end
+
+     teams_avg_goals = @teams_goals.merge(@teams_games){|key, old, new| Array(old).push(new) }
+     teams_avg_goals.each do |a, b|
+       teams_avg_goals[a] = b[0].to_f / b[1].to_f
+     end
+     best_gpg = 0.0
+     teams_avg_goals.values.each do |value|
+       if value > best_gpg
+         best_gpg = value
+       end
+     end
+     best_gpg
+  end
+
+
   def count_of_teams
     @teams.count
   end
@@ -263,4 +302,5 @@ class StatTracker
     end
     worst_fans.keys
   end
+
 end
