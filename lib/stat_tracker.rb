@@ -165,14 +165,18 @@ class StatTracker
     goals_by_season
   end
 
-  def highest_scoring_home_team
+  def generate_number_of_games_by_team_id(csv)
     team_games_by_id = Hash.new(0)
-    team_scores_by_id = Hash.new(0)
 
-    game_teams.each do |game|
+    csv.each do |game|
       team_games_by_id[game.team_id] += 1
     end
     team_games_by_id
+  end
+
+  def highest_scoring_home_team
+    team_scores_by_id = Hash.new(0)
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
 
     teams.each do |team|
       team_scores_by_id[team.team_id] = 0
@@ -205,6 +209,7 @@ class StatTracker
         best_home_id = id
       end
     end
+
     best_home_id
     teams.each do |team|
       if best_home_id == team.team_id
@@ -214,13 +219,8 @@ class StatTracker
   end
 
   def lowest_scoring_home_team
-    team_games_by_id = Hash.new(0)
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
     team_scores_by_id = Hash.new(0)
-
-    game_teams.each do |game|
-      team_games_by_id[game.team_id] += 1
-    end
-    team_games_by_id
 
     game_teams.each do |game|
       if game.hoa == "home"
@@ -259,13 +259,8 @@ class StatTracker
   end
 
   def highest_scoring_visitor
-    team_games_by_id = Hash.new(0)
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
     team_scores_by_id = Hash.new(0)
-
-    game_teams.each do |game|
-      team_games_by_id[game.team_id] += 1
-    end
-    team_games_by_id
 
     teams.each do |team|
       team_scores_by_id[team.team_id] = 0
@@ -307,13 +302,8 @@ class StatTracker
   end
 
   def lowest_scoring_visitor
-      team_games_by_id = Hash.new(0)
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
       team_scores_by_id = Hash.new(0)
-
-      game_teams.each do |game|
-        team_games_by_id[game.team_id] += 1
-      end
-      team_games_by_id
 
       game_teams.each do |game|
         if game.hoa == "away"

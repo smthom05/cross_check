@@ -18,24 +18,28 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_exists
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_instance_of StatTracker, stat_tracker
   end
 
   def test_it_can_determine_most_popular_venue
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_equal "United Center", stat_tracker.most_popular_venue
   end
 
   def test_it_can_determine_least_popular_venue
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_equal "Scotiabank Place", stat_tracker.least_popular_venue
   end
 
   def test_it_can_determine_season_with_most_games
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     #full csv gives back 20172018
@@ -43,6 +47,7 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_can_determine_season_with_fewest_games
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     #full csv gives back 20122013
@@ -50,6 +55,7 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_knows_highest_total_score
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_instance_of Integer, stat_tracker.highest_total_score
@@ -57,6 +63,7 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_knows_lowest_total_score
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_instance_of Integer, stat_tracker.lowest_total_score
@@ -64,6 +71,7 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_knows_biggest_blowout
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_instance_of Integer, stat_tracker.biggest_blowout
@@ -71,6 +79,7 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_knows_games_by_season
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_instance_of Hash, stat_tracker.count_of_games_by_season
@@ -78,11 +87,13 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_can_determine_percentage_home_wins
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
     assert_equal 70.0, stat_tracker.percentage_home_wins
   end
 
   def test_it_can_determine_percentage_visitor_wins
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
     assert_equal 30.0, stat_tracker.percentage_visitor_wins
   end
@@ -93,12 +104,14 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_can_determine_average_goals_by_season
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
     hash = {"20122013"=>4.912280701754386, "20162017"=>5.75, "20142015"=>4.823529411764706, "20152016"=>4.875, "20132014"=>5.666666666666667}
     assert_equal hash, stat_tracker.average_goals_by_season
   end
 
   def test_it_knows_wins_and_losses
+    skip
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_equal false, stat_tracker.game_teams[0].won?
@@ -106,6 +119,7 @@ class StatTrackerTest < Minitest::Test
   end
 
   def test_it_knows_highest_scoring_home_team
+
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_equal "Islanders", stat_tracker.highest_scoring_home_team

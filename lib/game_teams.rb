@@ -21,7 +21,7 @@ class GameTeams
     @won = attribute_array[3]
     @settled_in = attribute_array[4]
     @head_coach = attribute_array[5]
-    @goals = attribute_array[6].to_i 
+    @goals = attribute_array[6].to_i
     @shots = attribute_array[7]
     @hits = attribute_array[8]
     @pim = attribute_array[9]
