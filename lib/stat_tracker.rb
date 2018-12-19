@@ -154,40 +154,30 @@ class StatTracker
 
 
   def best_offense
-    @teams_games = Hash[@teams.map {|team| [team, 0]}]
-    @teams_goals = Hash[@teams.map {|team| [team, 0]}]
+    teams_games = Hash[@teams.map {|team| [team, 0]}]
+    teams_goals = Hash[@teams.map {|team| [team, 0]}]
 
-      @game_teams.each do |game|
-        @teams_games.each do |team, games|
+    @game_teams.each do |game|
+      @teams.each do |team|
         if team.team_id == game.team_id
-          @teams_games[team] += 1
-        else
-          @teams_games[team]
+          teams_games[team] += 1
+          teams_goals[team] += game.goals.to_f
         end
       end
     end
 
-     @game_teams.each do |game|
-       @teams_goals.each do |team, goals|
-         if team.team_id == game.team_id
-           @teams_goals[team] += game.goals.to_f
-         else
-           @teams_goals[team]
-        end
-       end
-     end
-
-     teams_avg_goals = @teams_goals.merge(@teams_games){|key, old, new| Array(old).push(new) }
-     teams_avg_goals.each do |a, b|
-       teams_avg_goals[a] = b[0].to_f / b[1].to_f
-     end
-     best_gpg = 0.0
-     teams_avg_goals.values.each do |value|
-       if value > best_gpg
-         best_gpg = value
-       end
-     end
-     best_gpg
+    teams_avg_goals = teams_goals.merge(teams_games){|key, old, new| Array(old).push(new) }
+    teams_avg_goals.each do |a, b|
+      if b[1] != 0
+        teams_avg_goals[a] = b[0].to_f / b[1].to_f
+      else
+        teams_avg_goals[a] = 0
+      end
+    end
+    best_team = teams_avg_goals.max_by do |team, gpg|
+      gpg
+    end
+    best_team[0].team_name
   end
 
 
@@ -300,6 +290,7 @@ class StatTracker
     worst_fans = away_and_home_win_percentage.select do |team, percentage|
       percentage > 0
     end
+
     worst_fans.keys
   end
 
