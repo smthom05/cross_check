@@ -97,4 +97,24 @@ class StatTrackerTest < Minitest::Test
     hash = {"20122013"=>4.912280701754386, "20162017"=>5.75, "20142015"=>4.823529411764706, "20152016"=>4.875, "20132014"=>5.666666666666667}
     assert_equal hash, stat_tracker.average_goals_by_season
   end
+
+  def test_it_can_count_teams
+    stat_tracker = StatTracker.from_csv_test(@locations)
+    assert_equal 33, stat_tracker.count_of_teams
+  end
+
+  def test_it_can_determine_winningest_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+    assert_equal "Bruins", stat_tracker.winningest_team
+  end
+
+  def test_it_can_determine_best_fans
+    stat_tracker = StatTracker.from_csv_test(@locations)
+    assert_equal "Capitals", stat_tracker.best_fans
+  end
+
+  def test_it_can_determine_worst_fans
+    stat_tracker = StatTracker.from_csv_test(@locations)
+    assert_equal [], stat_tracker.worst_fans
+  end
 end
