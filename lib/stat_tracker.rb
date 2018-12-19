@@ -174,16 +174,115 @@ class StatTracker
         teams_avg_goals[a] = 0
       end
     end
-    best_team = teams_avg_goals.max_by do |team, gpg|
+    best_offensive_team = teams_avg_goals.max_by do |team, gpg|
       gpg
     end
-    best_team[0].team_name
+    best_offensive_team[0].team_name
   end
 
+  def worst_offense
+    teams_games = Hash[@teams.map {|team| [team, 0]}]
+    teams_goals = Hash[@teams.map {|team| [team, 0]}]
+
+    @game_teams.each do |game|
+      @teams.each do |team|
+        if team.team_id == game.team_id
+          teams_games[team] += 1
+          teams_goals[team] += game.goals.to_f
+        end
+      end
+    end
+
+    teams_avg_goals = teams_goals.merge(teams_games){|key, old, new| Array(old).push(new) }
+    teams_avg_goals.each do |a, b|
+      if b[1] != 0
+        teams_avg_goals[a] = b[0].to_f / b[1].to_f
+      else
+        teams_avg_goals[a] = 0
+      end
+    end
+
+    worst_offensive_team = teams_avg_goals.min_by do |team, gpg|
+      gpg
+    end
+    worst_offensive_team[0].team_name
+  end
+
+  def best_defense
+    teams_games = Hash[@teams.map {|team| [team, 0]}]
+    teams_goals_against = Hash[@teams.map {|team| [team, 0]}]
+
+    @game_teams.each do |game|
+      @teams.each do |team|
+        if team.team_id == game.team_id
+          teams_games[team] += 1
+        end
+      end
+    end
+
+    @games.each do |game|
+      @teams.each do |team|
+        if game.away_team_id == team.team_id
+          teams_goals_against[team] += game.home_goals
+        elsif game.home_team_id == team.team_id
+          teams_goals_against[team] += game.away_goals
+        end
+      end
+    end
+    teams_avg_goals_against = teams_goals_against.merge(teams_games){|key, old, new| Array(old).push(new) }
+    teams_avg_goals_against.each do |a, b|
+      if b[1] != 0
+        teams_avg_goals_against[a] = b[0].to_f / b[1].to_f
+      else
+        teams_avg_goals_against[a] = 0
+      end
+    end
+    best_defensive_team = teams_avg_goals_against.min_by do |team, gpg_against|
+      gpg_against
+    end
+    best_defensive_team[0].team_name
+  end
+
+  def worst_defense
+    teams_games = Hash[@teams.map {|team| [team, 0]}]
+    teams_goals_against = Hash[@teams.map {|team| [team, 0]}]
+
+    @game_teams.each do |game|
+      @teams.each do |team|
+        if team.team_id == game.team_id
+          teams_games[team] += 1
+        end
+      end
+    end
+
+    @games.each do |game|
+      @teams.each do |team|
+        if game.away_team_id == team.team_id
+          teams_goals_against[team] += game.home_goals
+        elsif game.home_team_id == team.team_id
+          teams_goals_against[team] += game.away_goals
+        end
+      end
+    end
+    teams_avg_goals_against = teams_goals_against.merge(teams_games){|key, old, new| Array(old).push(new) }
+    teams_avg_goals_against.each do |a, b|
+      if b[1] != 0
+        teams_avg_goals_against[a] = b[0].to_f / b[1].to_f
+      else
+        teams_avg_goals_against[a] = 0
+      end
+    end
+    worst_defensive_team = teams_avg_goals_against.max_by do |team, gpg_against|
+      gpg_against
+    end
+    require 'pry'; binding.pry
+    worst_defensive_team[0].team_name
+  end
 
   def count_of_teams
     @teams.count
   end
+
 
   def winningest_team
     teams_and_number_of_wins = Hash[@teams.map {|team| [team, 0]}]

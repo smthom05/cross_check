@@ -5,9 +5,9 @@ require './lib/stat_tracker'
 
 class StatTrackerTest < Minitest::Test
   def setup
-    game_path = './data/game_sample.csv'
+    game_path = './data/game.csv'
     team_path = './data/team_info.csv'
-    game_teams_path = './data/game_teams_stats_sample.csv'
+    game_teams_path = './data/game_teams_stats.csv'
 
     @locations = {
       games: game_path,
@@ -105,6 +105,21 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_best_offense
     stat_tracker = StatTracker.from_csv(@locations)
     assert_equal "Bruins", stat_tracker.best_offense
+  end
+
+  def test_it_can_determine_worst_offense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "Devils", stat_tracker.worst_offense
+  end
+
+  def test_it_can_determine_best_defense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "Kings", stat_tracker.best_defense
+  end
+
+  def test_it_can_determine_worst_defense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "Coyotes", stat_tracker.worst_defense
   end
 
   def test_it_can_count_teams
