@@ -1,8 +1,7 @@
+require './test/test_helper'
 require 'minitest/autorun'
 require 'minitest/pride'
-require 'simplecov'
 require './lib/stat_tracker'
-SimpleCov.start
 
 class StatTrackerTest < Minitest::Test
   def setup
@@ -74,27 +73,55 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv_test(@locations)
 
     assert_instance_of Hash, stat_tracker.count_of_games_by_season
-    assert_equal ({"20122013"=>57, "20162017"=>4, "20142015"=>17, "20152016"=>16, "20132014"=>6}), stat_tracker.count_of_games_by_season
+    assert_equal ({20122013=>57, 20162017=>4, 20142015=>17, 20152016=>16, 20132014=>6}), stat_tracker.count_of_games_by_season
   end
 
   def test_it_can_determine_percentage_home_wins
     stat_tracker = StatTracker.from_csv_test(@locations)
+
     assert_equal 70.0, stat_tracker.percentage_home_wins
   end
 
   def test_it_can_determine_percentage_visitor_wins
     stat_tracker = StatTracker.from_csv_test(@locations)
+
     assert_equal 30.0, stat_tracker.percentage_visitor_wins
   end
 
   def test_it_can_determine_average_goals_per_game
     stat_tracker = StatTracker.from_csv_test(@locations)
+
     assert_equal 4.97, stat_tracker.average_goals_per_game
   end
 
   def test_it_can_determine_average_goals_by_season
     stat_tracker = StatTracker.from_csv_test(@locations)
-    hash = {"20122013"=>4.912280701754386, "20162017"=>5.75, "20142015"=>4.823529411764706, "20152016"=>4.875, "20132014"=>5.666666666666667}
+    hash = {20122013=>4.912280701754386, 20162017=>5.75, 20142015=>4.823529411764706, 20152016=>4.875, 20132014=>5.666666666666667}
+
     assert_equal hash, stat_tracker.average_goals_by_season
+  end
+
+  def test_it_can_count_teams
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal 33, stat_tracker.count_of_teams
+  end
+
+  def test_it_can_determine_winningest_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Bruins", stat_tracker.winningest_team
+  end
+
+  def test_it_can_determine_best_fans
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Capitals", stat_tracker.best_fans
+  end
+
+  def test_it_can_determine_worst_fans
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal [], stat_tracker.worst_fans
   end
 end

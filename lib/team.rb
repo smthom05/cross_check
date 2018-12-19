@@ -6,8 +6,8 @@ class Team
               :abbreviation,
               :link
   def initialize(attribute_array)
-    @team_id = attribute_array[0]
-    @franchise_id = attribute_array[1]
+    @team_id = attribute_array[0].to_i
+    @franchise_id = attribute_array[1].to_i
     @short_name = attribute_array[2]
     @team_name = attribute_array[3]
     @abbreviation = attribute_array[4]
