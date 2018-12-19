@@ -271,9 +271,9 @@ class StatTracker
     away_and_home_win_percentage.each do |team, pair|
       away_and_home_win_percentage[team] = (pair[0] - pair[1])
     end
-    bad_fans = away_and_home_win_percentage.select do |team, percentage|
+    worst_fans = away_and_home_win_percentage.select do |team, percentage|
       percentage > 0
     end
-    bad_fans.keys
+    worst_fans.keys
   end
 end
