@@ -13,19 +13,6 @@ class StatTracker
     @game_teams = game_teams
   end
 
-  def self.from_csv_test(locations)
-    all_games = CSV.readlines(locations[:games])[1, 100].map do |game|
-      Game.new(game)
-    end
-    all_game_teams = CSV.readlines(locations[:game_teams])[1, 100].map do |game|
-      GameTeams.new(game)
-    end
-    all_teams = CSV.readlines(locations[:teams])[1, 100].map do |team|
-      Team.new(team)
-    end
-    StatTracker.new(all_games, all_teams, all_game_teams)
-  end
-
   def self.from_csv(locations)
     all_games = CSV.readlines(locations[:games])[1..-1].map do |game|
       Game.new(game)

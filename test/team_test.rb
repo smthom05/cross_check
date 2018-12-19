@@ -5,9 +5,9 @@ require './lib/team'
 
 class TeamTest < Minitest::Test
   def setup
-    game_path = './data/game.csv'
+    game_path = './data/game_sample.csv'
     team_path = './data/team_info.csv'
-    game_teams_path = './data/game_teams_stats.csv'
+    game_teams_path = './data/game_teams_stats_sample.csv'
 
     @locations = {
       games: game_path,
@@ -17,14 +17,14 @@ class TeamTest < Minitest::Test
   end
 
   def test_it_exists
-    stat_tracker = StatTracker.from_csv_test(@locations)
+    stat_tracker = StatTracker.from_csv(@locations)
     team = stat_tracker.teams[0]
 
     assert_instance_of Team, team
   end
 
   def test_it_has_attributes
-    stat_tracker = StatTracker.from_csv_test(@locations)
+    stat_tracker = StatTracker.from_csv(@locations)
     team = stat_tracker.teams[0]
 
     assert_equal 1, team.team_id

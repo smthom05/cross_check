@@ -5,9 +5,9 @@ require './lib/game'
 
 class GameTest < Minitest::Test
   def setup
-    game_path = './data/game.csv'
+    game_path = './data/game_sample.csv'
     team_path = './data/team_info.csv'
-    game_teams_path = './data/game_teams_stats.csv'
+    game_teams_path = './data/game_teams_stats_sample.csv'
 
     @locations = {
       games: game_path,
@@ -17,14 +17,14 @@ class GameTest < Minitest::Test
   end
 
   def test_it_exists
-    stat_tracker = StatTracker.from_csv_test(@locations)
+    stat_tracker = StatTracker.from_csv(@locations)
     game = stat_tracker.games[0]
 
     assert_instance_of Game, game
   end
 
   def test_it_has_attributes
-    stat_tracker = StatTracker.from_csv_test(@locations)
+    stat_tracker = StatTracker.from_csv(@locations)
     game = stat_tracker.games[0]
 
     assert_equal 2012030221, game.game_id
