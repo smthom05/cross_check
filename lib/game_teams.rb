@@ -15,20 +15,20 @@ class GameTeams
               :giveaways,
               :takeaways
   def initialize(attribute_array)
-    @game_id = attribute_array[0]
-    @team_id = attribute_array[1]
+    @game_id = attribute_array[0].to_i
+    @team_id = attribute_array[1].to_i
     @hoa = attribute_array[2]
     @won = attribute_array[3]
     @settled_in = attribute_array[4]
     @head_coach = attribute_array[5]
-    @goals = attribute_array[6]
-    @shots = attribute_array[7]
-    @hits = attribute_array[8]
-    @pim = attribute_array[9]
-    @powerPlayOpportunities = attribute_array[10]
-    @powerPlayGoals =  attribute_array[11]
-    @faceOffWinPercentage = attribute_array[12]
-    @giveaways = attribute_array[13]
-    @takeaways = attribute_array[14]
+    @goals = attribute_array[6].to_i
+    @shots = attribute_array[7].to_i
+    @hits = attribute_array[8].to_i
+    @pim = attribute_array[9].to_i
+    @powerPlayOpportunities = attribute_array[10].to_i
+    @powerPlayGoals =  attribute_array[11].to_i
+    @faceOffWinPercentage = attribute_array[12].to_f
+    @giveaways = attribute_array[13].to_i
+    @takeaways = attribute_array[14].to_i
   end
 end
