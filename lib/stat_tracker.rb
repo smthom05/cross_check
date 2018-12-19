@@ -64,7 +64,7 @@ class StatTracker
     @games.each do |game|
       seasons << game.season
     end
-    (seasons.max_by {|season| seasons.count(season)}).to_i
+    (seasons.max_by {|season| seasons.count(season)})
   end
 
   #method to find season with fewest games played
@@ -73,7 +73,7 @@ class StatTracker
     @games.each do |game|
       seasons << game.season
     end
-    (seasons.min_by {|season| seasons.count(season)}).to_i
+    (seasons.min_by {|season| seasons.count(season)})
   end
 
   def highest_total_score
