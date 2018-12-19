@@ -108,13 +108,24 @@ class StatTrackerTest < Minitest::Test
   def test_it_knows_highest_scoring_home_team
     stat_tracker = StatTracker.from_csv_test(@locations)
 
-    assert_equal "Blackhawks", stat_tracker.highest_scoring_home_team
+    assert_equal "Islanders", stat_tracker.highest_scoring_home_team
   end
 
   def test_it_knows_lowest_scoring_home_team
     stat_tracker = StatTracker.from_csv_test(@locations)
-    stat_tracker2 = StatTracker.from_csv_test(@locations)
+
     assert_equal "Wild", stat_tracker.lowest_scoring_home_team
-    assert_equal "Wild", stat_tracker2.lowest_scoring_home_team
+  end
+
+  def test_it_knows_highest_scoring_away_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Senators", stat_tracker.highest_scoring_visitor
+  end
+
+  def test_it_knows_lowest_scoring_away_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Canadiens", stat_tracker.lowest_scoring_visitor
   end
 end

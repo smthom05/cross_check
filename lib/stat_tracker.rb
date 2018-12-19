@@ -166,7 +166,13 @@ class StatTracker
   end
 
   def highest_scoring_home_team
-    team_scores_by_id = Hash.new
+    team_games_by_id = Hash.new(0)
+    team_scores_by_id = Hash.new(0)
+
+    game_teams.each do |game|
+      team_games_by_id[game.team_id] += 1
+    end
+    team_games_by_id
 
     teams.each do |team|
       team_scores_by_id[team.team_id] = 0
@@ -180,15 +186,21 @@ class StatTracker
     end
 
     team_scores_by_id
+    average_hash = team_scores_by_id.merge(team_games_by_id){|key, old, new| Array(old).push(new)}
+
+    average_hash.each do |id, value|
+      average_hash[id] = value[0].to_f / value[1].to_f
+    end
+    average_hash
     highest_score = 0
-    team_scores_by_id.each do |_, score|
+    average_hash.each do |_, score|
       if score > highest_score
         highest_score = score
       end
     end
     highest_score
     best_home_id = "0"
-    team_scores_by_id.each do |id, score|
+    average_hash.each do |id, score|
       if score == highest_score
         best_home_id = id
       end
@@ -202,13 +214,13 @@ class StatTracker
   end
 
   def lowest_scoring_home_team
-    teams_games_by_id = Hash.new 
-    team_scores_by_id = Hash.new
+    team_games_by_id = Hash.new(0)
+    team_scores_by_id = Hash.new(0)
 
-    teams.each do |team|
-      team_scores_by_id[team.team_id] = 0
+    game_teams.each do |game|
+      team_games_by_id[game.team_id] += 1
     end
-    team_scores_by_id
+    team_games_by_id
 
     game_teams.each do |game|
       if game.hoa == "home"
@@ -216,27 +228,126 @@ class StatTracker
       end
     end
     team_scores_by_id
-    lowest_score = 1000
+    average_hash = team_scores_by_id.merge(team_games_by_id){|key, old, new| Array(old).push(new)}
 
-    team_scores_by_id.each do |_, score|
-      if score < lowest_score && score != 0
+    average_hash.each do |id, value|
+      average_hash[id] = value[0].to_f / value[1].to_f
+    end
+    average_hash
+
+    lowest_score = 10.0
+    average_hash.each do |_, score|
+      if score < lowest_score
         lowest_score = score
       end
     end
     lowest_score
 
     worst_home_id = "0"
-    team_scores_by_id.each do |id, score|
+    average_hash.each do |id, score|
       if score == lowest_score
         worst_home_id = id
       end
     end
-
     worst_home_id
+
     teams.each do |team|
       if worst_home_id == team.team_id
         return team.team_name
       end
     end
+  end
+
+  def highest_scoring_visitor
+    team_games_by_id = Hash.new(0)
+    team_scores_by_id = Hash.new(0)
+
+    game_teams.each do |game|
+      team_games_by_id[game.team_id] += 1
+    end
+    team_games_by_id
+
+    teams.each do |team|
+      team_scores_by_id[team.team_id] = 0
+    end
+    team_scores_by_id
+
+    game_teams.each do |game|
+      if game.hoa == "away"
+        team_scores_by_id[game.team_id] += game.goals
+      end
+    end
+
+    team_scores_by_id
+    average_hash = team_scores_by_id.merge(team_games_by_id){|key, old, new| Array(old).push(new)}
+
+    average_hash.each do |id, value|
+      average_hash[id] = value[0].to_f / value[1].to_f
+    end
+    average_hash
+    highest_score = 0
+    average_hash.each do |_, score|
+      if score > highest_score
+        highest_score = score
+      end
+    end
+    highest_score
+    best_home_id = "0"
+    average_hash.each do |id, score|
+      if score == highest_score
+        best_home_id = id
+      end
+    end
+    best_home_id
+    teams.each do |team|
+      if best_home_id == team.team_id
+        return team.team_name
+      end
+    end
+  end
+
+  def lowest_scoring_visitor
+      team_games_by_id = Hash.new(0)
+      team_scores_by_id = Hash.new(0)
+
+      game_teams.each do |game|
+        team_games_by_id[game.team_id] += 1
+      end
+      team_games_by_id
+
+      game_teams.each do |game|
+        if game.hoa == "away"
+          team_scores_by_id[game.team_id] += game.goals
+        end
+      end
+      team_scores_by_id
+      average_hash = team_scores_by_id.merge(team_games_by_id){|key, old, new| Array(old).push(new)}
+
+      average_hash.each do |id, value|
+        average_hash[id] = value[0].to_f / value[1].to_f
+      end
+      average_hash
+
+      lowest_score = 10.0
+      average_hash.each do |_, score|
+        if score < lowest_score
+          lowest_score = score
+        end
+      end
+      lowest_score
+
+      worst_home_id = "0"
+      average_hash.each do |id, score|
+        if score == lowest_score
+          worst_home_id = id
+        end
+      end
+      worst_home_id
+
+      teams.each do |team|
+        if worst_home_id == team.team_id
+          return team.team_name
+        end
+      end
   end
 end
