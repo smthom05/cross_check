@@ -107,6 +107,21 @@ class StatTrackerTest < Minitest::Test
     assert_equal "Bruins", stat_tracker.best_offense
   end
 
+  def test_it_can_determine_worst_offense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "Devils", stat_tracker.worst_offense
+  end
+
+  def test_it_can_determine_best_defense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "Kings", stat_tracker.best_defense
+  end
+
+  def test_it_can_determine_worst_defense
+    stat_tracker = StatTracker.from_csv(@locations)
+    assert_equal "Coyotes", stat_tracker.worst_defense
+  end
+
   def test_it_can_count_teams
     stat_tracker = StatTracker.from_csv(@locations)
 
