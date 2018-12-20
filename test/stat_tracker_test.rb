@@ -1,7 +1,5 @@
 require './test/test_helper'
 require './lib/score_finder'
-require 'minitest/autorun'
-require 'minitest/pride'
 require './lib/stat_tracker'
 
 class StatTrackerTest < Minitest::Test

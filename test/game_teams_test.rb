@@ -1,12 +1,11 @@
 require './test/test_helper'
-require 'minitest/autorun'
 require './lib/stat_tracker'
 require './lib/game_teams'
 
 class GameTeamsTest < Minitest::Test
   def setup
     game_path = './data/game_sample.csv'
-    team_path = './data/team_info.csv'
+    team_path = './data/team_info_sample.csv'
     game_teams_path = './data/game_teams_stats_sample.csv'
 
     @locations = {
