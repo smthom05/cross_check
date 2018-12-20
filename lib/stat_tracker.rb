@@ -581,4 +581,21 @@ class StatTracker
     end
     biggest_surprise.max_by{|team, win_percentage_difference| win_percentage_difference}[0].team_name
   end
+
+  def team_info(team_id)
+    team_info_hash = {}
+    @teams.each do |team|
+      if team_id == team.team_id
+        team_info_hash[:team_id] = team.team_id
+        team_info_hash[:franchise_id] = team.franchise_id
+        team_info_hash[:short_name] = team.short_name
+        team_info_hash[:team_name] = team.team_name
+        team_info_hash[:abbreviation] = team.abbreviation
+        team_info_hash[:link] = team.link
+      end
+    end
+    team_info_hash
+  end
+
+
 end
