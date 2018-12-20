@@ -1,4 +1,5 @@
 require './test/test_helper'
+require './lib/score_finder'
 require 'minitest/autorun'
 require 'minitest/pride'
 require './lib/stat_tracker'
@@ -101,6 +102,36 @@ class StatTrackerTest < Minitest::Test
     assert_equal hash, stat_tracker.average_goals_by_season
   end
 
+  def test_it_knows_wins_and_losses
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal false, stat_tracker.game_teams[0].won?
+    assert_equal true, stat_tracker.game_teams[1].won?
+  end
+
+  def test_it_knows_highest_scoring_home_team
+
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Islanders", stat_tracker.highest_scoring_home_team
+  end
+
+  def test_it_knows_lowest_scoring_home_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Wild", stat_tracker.lowest_scoring_home_team
+  end
+
+  def test_it_knows_highest_scoring_away_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Senators", stat_tracker.highest_scoring_visitor
+  end
+
+  def test_it_knows_lowest_scoring_away_team
+    stat_tracker = StatTracker.from_csv_test(@locations)
+
+    assert_equal "Canadiens", stat_tracker.lowest_scoring_visitor
 
   def test_it_can_determine_best_offense
     stat_tracker = StatTracker.from_csv(@locations)
@@ -144,5 +175,6 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
 
     assert_equal [], stat_tracker.worst_fans
+
   end
 end

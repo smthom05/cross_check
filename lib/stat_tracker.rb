@@ -4,6 +4,9 @@ require './lib/game_teams'
 require './lib/team'
 
 class StatTracker
+
+  include ScoreFinder
+
   attr_reader :games,
               :teams,
               :game_teams
@@ -150,6 +153,38 @@ class StatTracker
       goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f)
     end
     goals_by_season
+  end
+
+  def highest_scoring_home_team
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
+    highest_scoring_home_team = highest_scoring_team(average_hash)
+  end
+
+  def lowest_scoring_home_team
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
+    lowest_scoring_home_team = lowest_scoring_team(average_hash)
+  end
+
+  def highest_scoring_visitor
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
+    highest_scoring_visitor = highest_scoring_team(average_hash)
+  end
+
+  def lowest_scoring_visitor
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
+    lowest_scoring_visitor = lowest_scoring_team(average_hash)
   end
 
 
@@ -391,5 +426,6 @@ class StatTracker
 
     worst_fans.keys
   end
+
 
 end
