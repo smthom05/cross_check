@@ -132,4 +132,10 @@ class StatTrackerTest < Minitest::Test
 
     assert_equal "Bruins", stat_tracker.biggest_bust(20122013)
   end
+
+  def test_it_can_determine_biggest_surprise
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "Rangers", stat_tracker.biggest_surprise(20122013)
+  end
 end
