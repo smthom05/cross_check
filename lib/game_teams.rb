@@ -31,4 +31,12 @@ class GameTeams
     @giveaways = attribute_array[13].to_i
     @takeaways = attribute_array[14].to_i
   end
+
+  def won?
+    if @won == "TRUE"
+      return true
+    elsif @won == "FALSE"
+      return false
+    end
+  end
 end
