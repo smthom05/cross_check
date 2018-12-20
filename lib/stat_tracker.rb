@@ -503,4 +503,19 @@ class StatTracker
     end
     biggest_bust.max_by{|team, win_percentage_difference| win_percentage_difference}[0].team_name
   end
+
+  def average_win_percentage(team_id)
+    games_played = 0
+    games_won = 0
+
+    game_teams.each do |game|
+      if game.team_id == team_id && game.won? == true
+        games_played += 1.0
+        games_won += 1.0
+      else game.team_id == team_id && game.won? == false
+        games_played += 1.0
+      end
+    end
+    average_winrate = games_won / games_played
+  end
 end

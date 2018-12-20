@@ -1,5 +1,6 @@
 module ScoreFinder
 
+  
   def generate_number_of_games_by_team_id(csv)
     team_games_by_id = Hash.new(0)
 
