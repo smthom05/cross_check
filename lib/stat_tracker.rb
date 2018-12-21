@@ -597,5 +597,4 @@ class StatTracker
     team_info_hash
   end
 
-
 end
