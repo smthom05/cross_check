@@ -510,6 +510,7 @@ class StatTracker
     teams_and_regular_games = Hash[@teams.map {|team| [team, 0]}]
     teams_and_preseason_wins = Hash[@teams.map {|team| [team, 0]}]
     teams_and_regular_wins = Hash[@teams.map {|team| [team, 0]}]
+
     preseason_games = []
     regular_games = []
     @games.each do |game|
@@ -538,6 +539,7 @@ class StatTracker
         regular_game_teams << game
       end
     end
+
     preseason_game_teams.each do |game|
       @teams.each do |team|
         if team.team_id == game.team_id
@@ -580,5 +582,70 @@ class StatTracker
       end
     end
     biggest_surprise.max_by{|team, win_percentage_difference| win_percentage_difference}[0].team_name
+  end
+
+  def season_summary(season, team_id)
+    preseason_wins = 0
+    preseason_games = 0
+    preseason_goals_scored = 0
+    preseason_goals_against = 0
+    regular_wins = 0
+    regular_games = 0
+    regular_goals_scored = 0
+    regular_goals_against = 0
+
+    @games.each do |game|
+      # require 'pry'; binding.pry
+      if game.season == season && game.away_team_id == team_id
+        if game.type == "P"
+          preseason_games += 1
+          preseason_goals_scored += game.away_goals
+          preseason_goals_against += game.home_goals
+          if game.away_goals > game.home_goals
+            preseason_wins += 1
+          end
+        elsif game.type == "R"
+          regular_games += 1
+          regular_goals_scored += game.away_goals
+          regular_goals_against += game.home_goals
+          if game.away_goals > game.home_goals
+            regular_wins += 1
+          end
+        end
+      end
+      if game.season == season && game.home_team_id == team_id
+        if game.type == "P"
+          preseason_games += 1
+          preseason_goals_scored += game.home_goals
+          preseason_goals_against += game.away_goals
+          if game.home_goals > game.away_goals
+            preseason_wins += 1
+          end
+        elsif game.type == "R"
+          regular_games += 1
+          regular_goals_scored += game.home_goals
+          regular_goals_against += game.away_goals
+          if game.home_goals > game.away_goals
+            regular_wins += 1
+          end
+        end
+      end
+    end
+    regular_win_percentage = (regular_wins.to_f / regular_games.to_f) * 100.0
+    preseason_win_percentage = (preseason_wins.to_f / preseason_games.to_f) * 100.0
+    preseason_hash = {
+      win_percentage: preseason_win_percentage,
+      goals_scored: preseason_goals_scored,
+      goals_against: preseason_goals_against
+    }
+    regular_hash = {
+      win_percentage: regular_win_percentage,
+      goals_scored: regular_goals_scored,
+      goals_against: regular_goals_against
+    }
+    {
+      preseason: preseason_hash,
+      regular_season: regular_hash
+    }
   end
 end
