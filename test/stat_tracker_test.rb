@@ -201,4 +201,11 @@ class StatTrackerTest < Minitest::Test
     }
     assert_equal season_summary, stat_tracker.season_summary(20122013, 6)
   end
+
+  def test_it_can_collect_team_stats
+    stat_tracker = StatTracker.from_csv(@locations)
+    stat_tracker.collect_league_stats
+
+    assert_equal 5, stat_tracker.teams[0].total_games
+  end
 end
