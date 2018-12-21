@@ -15,8 +15,6 @@ class Team
   end
 
   def return_team_name_by_id(id)
-      if id == team.team_id
-        return team.team_name
-      end
+    return team_name if id == team_id
   end
 end

@@ -83,7 +83,7 @@ module ScoreFinder
       end
     end
 
-    best_scoring_id = nil 
+    best_scoring_id = nil
     hash.each do |id, score|
       if score == highest_score
         best_scoring_id = id
@@ -91,9 +91,8 @@ module ScoreFinder
     end
 
     teams.each do |team|
-      if best_scoring_id == team.team_id
-        return team.team_name
-      end
+      best_team = team.return_team_name_by_id(best_scoring_id)
+      return best_team if best_team
     end
   end
 
