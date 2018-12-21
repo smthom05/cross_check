@@ -2,10 +2,11 @@ require 'csv'
 require './lib/game'
 require './lib/game_teams'
 require './lib/team'
-
+require './lib/seasons_calculations'
 class StatTracker
 
   include ScoreFinder
+  include SeasonsCalculations
 
   attr_reader :games,
               :teams,
@@ -49,22 +50,22 @@ class StatTracker
   end
 
   #method to find season with most games played
-  def season_with_most_games
-    seasons = []
-    @games.each do |game|
-      seasons << game.season
-    end
-    (seasons.max_by {|season| seasons.count(season)})
-  end
+  # def season_with_most_games
+  #   seasons = []
+  #   @games.each do |game|
+  #     seasons << game.season
+  #   end
+  #   (seasons.max_by {|season| seasons.count(season)})
+  # end
 
   #method to find season with fewest games played
-  def season_with_fewest_games
-    seasons = []
-    @games.each do |game|
-      seasons << game.season
-    end
-    (seasons.min_by {|season| seasons.count(season)})
-  end
+  # def season_with_fewest_games
+  #   seasons = []
+  #   @games.each do |game|
+  #     seasons << game.season
+  #   end
+  #   (seasons.min_by {|season| seasons.count(season)})
+  # end
 
   def highest_total_score
     highest_score = 0
@@ -155,37 +156,37 @@ class StatTracker
     goals_by_season
   end
 
-  def highest_scoring_home_team
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
-    highest_scoring_home_team = highest_scoring_team(average_hash)
-  end
+  # def highest_scoring_home_team
+  #   team_scores_by_id = generate_scores_by_team_id(teams)
+  #   team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+  #   goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
+  #   average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
+  #   highest_scoring_home_team = highest_scoring_team(average_hash)
+  # end
 
-  def lowest_scoring_home_team
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
-    lowest_scoring_home_team = lowest_scoring_team(average_hash)
-  end
+  # def lowest_scoring_home_team
+  #   team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+  #   team_scores_by_id = generate_scores_by_team_id(teams)
+  #   goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
+  #   average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
+  #   lowest_scoring_home_team = lowest_scoring_team(average_hash)
+  # end
 
-  def highest_scoring_visitor
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
-    highest_scoring_visitor = highest_scoring_team(average_hash)
-  end
+  # def highest_scoring_visitor
+  #   team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+  #   team_scores_by_id = generate_scores_by_team_id(teams)
+  #   goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
+  #   average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
+  #   highest_scoring_visitor = highest_scoring_team(average_hash)
+  # end
 
-  def lowest_scoring_visitor
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
-    lowest_scoring_visitor = lowest_scoring_team(average_hash)
-  end
+  # def lowest_scoring_visitor
+  #   team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+  #   team_scores_by_id = generate_scores_by_team_id(teams)
+  #   goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
+  #   average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
+  #   lowest_scoring_visitor = lowest_scoring_team(average_hash)
+  # end
 
 
   def best_offense

@@ -13,4 +13,10 @@ class Team
     @abbreviation = attribute_array[4]
     @link = attribute_array[5]
   end
+
+  def return_team_name_by_id(id)
+      if id == team.team_id
+        return team.team_name
+      end
+  end
 end
