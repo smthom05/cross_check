@@ -1,5 +1,4 @@
 require './test/test_helper'
-require 'minitest/autorun'
 require './lib/stat_tracker'
 require './lib/team'
 

@@ -1,7 +1,5 @@
 require './test/test_helper'
 require './lib/score_finder'
-require 'minitest/autorun'
-require 'minitest/pride'
 require './lib/stat_tracker'
 
 class StatTrackerTest < Minitest::Test
@@ -181,9 +179,33 @@ class StatTrackerTest < Minitest::Test
     assert_equal "Bruins", stat_tracker.biggest_bust(20122013)
   end
 
+
   def test_it_can_give_average_winrate
     stat_tracker = StatTracker.from_csv(@locations)
 
     assert_equal 0.25, stat_tracker.average_win_percentage(6)
+  end
+  
+  def test_it_can_determine_biggest_surprise
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "Rangers", stat_tracker.biggest_surprise(20122013)
+  end
+
+  def test_it_can_create_a_season_summary
+    stat_tracker = StatTracker.from_csv(@locations)
+    season_summary = {
+      preseason: {
+        win_percentage: 80.0,
+        goals_scored: 16,
+        goals_against: 10
+      },
+      regular_season: {
+        win_percentage: 100.0,
+        goals_scored: 6,
+        goals_against: 2
+      }
+    }
+    assert_equal season_summary, stat_tracker.season_summary(20122013, 6)
   end
 end
