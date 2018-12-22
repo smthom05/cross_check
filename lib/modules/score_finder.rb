@@ -1,4 +1,35 @@
 module ScoreFinder
+  def highest_scoring_home_team
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
+    highest_scoring_home_team = highest_scoring_team(average_hash)
+  end
+
+  def lowest_scoring_home_team
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
+    lowest_scoring_home_team = lowest_scoring_team(average_hash)
+  end
+
+  def highest_scoring_visitor
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
+    highest_scoring_visitor = highest_scoring_team(average_hash)
+  end
+
+  def lowest_scoring_visitor
+    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
+    team_scores_by_id = generate_scores_by_team_id(teams)
+    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
+    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
+    lowest_scoring_visitor = lowest_scoring_team(average_hash)
+  end
 
   def generate_number_of_games_by_team_id(csv)
     team_games_by_id = Hash.new(0)
@@ -51,18 +82,17 @@ module ScoreFinder
         highest_score = score
       end
     end
-    highest_score
-    best_scoring_id = "0"
+
+    best_scoring_id = nil
     hash.each do |id, score|
       if score == highest_score
         best_scoring_id = id
       end
     end
-    best_scoring_id
+
     teams.each do |team|
-      if best_scoring_id == team.team_id
-        return team.team_name
-      end
+      best_team = team.return_team_name_by_id(best_scoring_id)
+      return best_team if best_team
     end
   end
 
@@ -73,7 +103,6 @@ module ScoreFinder
         lowest_score = score
       end
     end
-    lowest_score
 
     worst_home_id = "0"
     hash.each do |id, score|
@@ -81,7 +110,6 @@ module ScoreFinder
         worst_home_id = id
       end
     end
-    worst_home_id
 
     teams.each do |team|
       if worst_home_id == team.team_id

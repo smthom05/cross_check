@@ -2,13 +2,13 @@ require 'csv'
 require './lib/game'
 require './lib/game_teams'
 require './lib/team'
-require './lib/modules/score_finder'
 require './lib/modules/league_stats'
+require './lib/modules/seasons_calculations'
 
 class StatTracker
 
-  include ScoreFinder
   include LeagueStats
+  include SeasonsCalculations
 
   attr_reader :games,
               :teams,
@@ -165,7 +165,6 @@ class StatTracker
     @teams[index].team_name
   end
 
-
   def best_offense
     goals_scored = @teams.map {|team| team.total_goals_scored}
     games_played = @teams.map {|team| team.total_games}
@@ -205,7 +204,6 @@ class StatTracker
   def count_of_teams
     @teams.count
   end
-
 
   def winningest_team
     number_of_wins = @teams.map {|team| team.total_wins}
@@ -279,6 +277,22 @@ class StatTracker
     @teams[biggest_bust_index].team_name
   end
 
+
+  def average_win_percentage(team_id)
+    games_played = 0
+    games_won = 0
+
+    game_teams.each do |game|
+      if game.team_id == team_id && game.won? == true
+        games_played += 1.0
+        games_won += 1.0
+      else game.team_id == team_id && game.won? == false
+        games_played += 1.0
+      end
+    end
+    average_winrate = games_won / games_played
+  end
+
   def biggest_surprise(season)
     collect_season_stats(season)
     preseason_games = teams.map {|team| team.preseason_games}
@@ -307,7 +321,20 @@ class StatTracker
     @teams[biggest_surprise_index].team_name
   end
 
-
+  def team_info(team_id)
+    team_info_hash = {}
+    @teams.each do |team|
+      if team_id == team.team_id
+        team_info_hash[:team_id] = team.team_id
+        team_info_hash[:franchise_id] = team.franchise_id
+        team_info_hash[:short_name] = team.short_name
+        team_info_hash[:team_name] = team.team_name
+        team_info_hash[:abbreviation] = team.abbreviation
+        team_info_hash[:link] = team.link
+      end
+    end
+    team_info_hash
+  end
 
   def season_summary(season, team_id)
     collect_season_stats(season)

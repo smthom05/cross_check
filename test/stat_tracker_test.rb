@@ -5,9 +5,9 @@ require './lib/modules/league_stats'
 
 class StatTrackerTest < Minitest::Test
   def setup
-    game_path = './data/game_sample.csv'
-    team_path = './data/team_info_sample.csv'
-    game_teams_path = './data/game_teams_stats_sample.csv'
+    game_path = './test/data/game_sample.csv'
+    team_path = './test/data/team_info_sample.csv'
+    game_teams_path = './test/data/game_teams_stats_sample.csv'
 
     @locations = {
       games: game_path,
@@ -180,11 +180,35 @@ class StatTrackerTest < Minitest::Test
     assert_equal "Bruins", stat_tracker.biggest_bust(20122013)
   end
 
+
+  def test_it_can_give_average_winrate
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 0.25, stat_tracker.average_win_percentage(6)
+  end
+  
   def test_it_can_determine_biggest_surprise
     stat_tracker = StatTracker.from_csv(@locations)
 
     assert_equal "Rangers", stat_tracker.biggest_surprise(20122013)
   end
+
+
+  def test_it_can_get_team_attributes
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    expected = {
+      team_id: 19,
+      franchise_id: 18,
+      short_name: "St Louis",
+      team_name: "Blues",
+      abbreviation: "STL",
+      link: "/api/v1/teams/19"
+    }
+
+    assert_equal expected, stat_tracker.team_info(19)
+  end
+
 
   def test_it_can_create_a_season_summary
     stat_tracker = StatTracker.from_csv(@locations)
@@ -202,4 +226,5 @@ class StatTrackerTest < Minitest::Test
     }
     assert_equal season_summary, stat_tracker.season_summary(20122013, 6)
   end
+
 end

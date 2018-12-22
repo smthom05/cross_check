@@ -49,4 +49,8 @@ class Team
     @regular_goals_scored = 0
     @regular_goals_against = 0
   end
+
+  def return_team_name_by_id(id)
+    return team_name if id == team_id
+  end
 end
