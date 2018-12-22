@@ -3,10 +3,12 @@ require './lib/game'
 require './lib/game_teams'
 require './lib/team'
 require './lib/score_finder'
+require './lib/seasons_calculations'
 
 class StatTracker
 
   include ScoreFinder
+  include SeasonsCalculations
 
   attr_reader :games,
               :teams,
@@ -50,22 +52,22 @@ class StatTracker
   end
 
   #method to find season with most games played
-  def season_with_most_games
-    seasons = []
-    @games.each do |game|
-      seasons << game.season
-    end
-    (seasons.max_by {|season| seasons.count(season)})
-  end
+  # def season_with_most_games
+  #   seasons = []
+  #   @games.each do |game|
+  #     seasons << game.season
+  #   end
+  #   (seasons.max_by {|season| seasons.count(season)})
+  # end
 
   #method to find season with fewest games played
-  def season_with_fewest_games
-    seasons = []
-    @games.each do |game|
-      seasons << game.season
-    end
-    (seasons.min_by {|season| seasons.count(season)})
-  end
+  # def season_with_fewest_games
+  #   seasons = []
+  #   @games.each do |game|
+  #     seasons << game.season
+  #   end
+  #   (seasons.min_by {|season| seasons.count(season)})
+  # end
 
   def highest_total_score
     highest_score = 0
@@ -155,39 +157,6 @@ class StatTracker
     end
     goals_by_season
   end
-
-  def highest_scoring_home_team
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
-    highest_scoring_home_team = highest_scoring_team(average_hash)
-  end
-
-  def lowest_scoring_home_team
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    goals_at_home = add_goals_by_home_or_away("home", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_at_home, team_games_by_id)
-    lowest_scoring_home_team = lowest_scoring_team(average_hash)
-  end
-
-  def highest_scoring_visitor
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
-    highest_scoring_visitor = highest_scoring_team(average_hash)
-  end
-
-  def lowest_scoring_visitor
-    team_games_by_id = generate_number_of_games_by_team_id(game_teams)
-    team_scores_by_id = generate_scores_by_team_id(teams)
-    goals_away = add_goals_by_home_or_away("away", team_scores_by_id)
-    average_hash = average_goals_per_game_by_team(goals_away, team_games_by_id)
-    lowest_scoring_visitor = lowest_scoring_team(average_hash)
-  end
-
 
   def best_offense
     teams_games = Hash[@teams.map {|team| [team, 0]}]
@@ -505,11 +474,28 @@ class StatTracker
     biggest_bust.max_by{|team, win_percentage_difference| win_percentage_difference}[0].team_name
   end
 
+
+  def average_win_percentage(team_id)
+    games_played = 0
+    games_won = 0
+
+    game_teams.each do |game|
+      if game.team_id == team_id && game.won? == true
+        games_played += 1.0
+        games_won += 1.0
+      else game.team_id == team_id && game.won? == false
+        games_played += 1.0
+      end
+    end
+    average_winrate = games_won / games_played
+  end
+     
   def biggest_surprise(season)
     teams_and_preseason_games = Hash[@teams.map {|team| [team, 0]}]
     teams_and_regular_games = Hash[@teams.map {|team| [team, 0]}]
     teams_and_preseason_wins = Hash[@teams.map {|team| [team, 0]}]
     teams_and_regular_wins = Hash[@teams.map {|team| [team, 0]}]
+
     preseason_games = []
     regular_games = []
     @games.each do |game|
@@ -538,6 +524,7 @@ class StatTracker
         regular_game_teams << game
       end
     end
+
     preseason_game_teams.each do |game|
       @teams.each do |team|
         if team.team_id == game.team_id
@@ -595,6 +582,71 @@ class StatTracker
       end
     end
     team_info_hash
+  end
+  
+  def season_summary(season, team_id)
+    preseason_wins = 0
+    preseason_games = 0
+    preseason_goals_scored = 0
+    preseason_goals_against = 0
+    regular_wins = 0
+    regular_games = 0
+    regular_goals_scored = 0
+    regular_goals_against = 0
+
+    @games.each do |game|
+      # require 'pry'; binding.pry
+      if game.season == season && game.away_team_id == team_id
+        if game.type == "P"
+          preseason_games += 1
+          preseason_goals_scored += game.away_goals
+          preseason_goals_against += game.home_goals
+          if game.away_goals > game.home_goals
+            preseason_wins += 1
+          end
+        elsif game.type == "R"
+          regular_games += 1
+          regular_goals_scored += game.away_goals
+          regular_goals_against += game.home_goals
+          if game.away_goals > game.home_goals
+            regular_wins += 1
+          end
+        end
+      end
+      if game.season == season && game.home_team_id == team_id
+        if game.type == "P"
+          preseason_games += 1
+          preseason_goals_scored += game.home_goals
+          preseason_goals_against += game.away_goals
+          if game.home_goals > game.away_goals
+            preseason_wins += 1
+          end
+        elsif game.type == "R"
+          regular_games += 1
+          regular_goals_scored += game.home_goals
+          regular_goals_against += game.away_goals
+          if game.home_goals > game.away_goals
+            regular_wins += 1
+          end
+        end
+      end
+    end
+    regular_win_percentage = (regular_wins.to_f / regular_games.to_f) * 100.0
+    preseason_win_percentage = (preseason_wins.to_f / preseason_games.to_f) * 100.0
+    preseason_hash = {
+      win_percentage: preseason_win_percentage,
+      goals_scored: preseason_goals_scored,
+      goals_against: preseason_goals_against
+    }
+    regular_hash = {
+      win_percentage: regular_win_percentage,
+      goals_scored: regular_goals_scored,
+      goals_against: regular_goals_against
+    }
+    {
+      preseason: preseason_hash,
+      regular_season: regular_hash
+    }
   end
 
 end
