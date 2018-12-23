@@ -363,7 +363,7 @@ class StatTracker
       regular_season: regular_hash
     }
   end
-# cut
+#
   def most_goals_scored(team_id)
     goals_per_game = @game_teams.map do |game|
       if game.team_id == team_id
@@ -381,5 +381,91 @@ class StatTracker
     end
     goals_per_game.compact.min
   end
-  # cut
+
+  def favorite_opponent(team_id)
+    teams_played_by_id = @games.map do |game|
+      if game.away_team_id == team_id
+        game.home_team_id
+      elsif game.home_team_id == team_id
+        game.away_team_id
+      end
+    end.compact.uniq
+    teams_and_wins = Hash.new(0)
+    teams_and_games = Hash.new(0)
+    @games.each do |game|
+      teams_played_by_id.each do |team|
+        if game.away_team_id == team
+          teams_and_games[team] += 1
+          if game.away_goals > game.home_goals
+            teams_and_wins[team] += 1
+          end
+        elsif game.home_team_id == team
+          teams_and_games[team] += 1
+          if game.home_goals > game.away_goals
+            teams_and_wins[team] += 1
+          end
+        end
+      end
+    end
+    require "pry"; binding.pry
+    # Combine and values of hashes
+    # Divide wins by games
+    # Select team id with lowest win percentage
+    # Return team with matching team id
+  end
+
+  def rival(team_id)
+  end
+
+  def biggest_team_blowout(team_id)
+    @games.map do |game|
+      if game.away_team_id == team_id
+        game.away_goals - game.home_goals
+      elsif game.home_team_id == team_id
+        game.home_goals - game.away_goals
+      end
+    end.compact.max
+  end
+
+  def worst_loss(team_id)
+    @games.map do |game|
+      if game.away_team_id == team_id
+        game.home_goals - game.away_goals
+      elsif game.home_team_id == team_id
+        game.away_goals - game.home_goals
+      end
+    end.compact.max
+  end
+
+  def seasonal_summary(team_id)
+    team = @teams.select do |team|
+      team.team_id == team_id
+    end[0]
+    seasons_played = @games.map do |game|
+      if game.home_team_id == team_id || game.away_team_id == team_id
+        game.season
+      end
+    end.compact.uniq
+    seasonal_summary = {}
+    seasons_played.each do |season|
+      collect_season_stats(season)
+      seasonal_summary[season] = {
+        preseason: {
+          win_percentage: team.preseason_win_percentage,
+          total_goals_scored: team.preseason_goals_scored,
+          total_goals_against: team.preseason_goals_against,
+          average_goals_scored: team.preseason_average_goals_scored,
+          average_goals_against: team.preseason_average_goals_against
+        },
+        regular_season: {
+          win_percentage: team.regular_win_percentage,
+          total_goals_scored: team.regular_goals_scored,
+          total_goals_against: team.regular_goals_against,
+          average_goals_scored: team.regular_average_goals_scored,
+          average_goals_against: team.regular_average_goals_against
+        }
+      }
+    end
+    seasonal_summary
+  end
 end

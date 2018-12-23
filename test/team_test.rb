@@ -4,9 +4,9 @@ require './lib/team'
 
 class TeamTest < Minitest::Test
   def setup
-    game_path = './data/game_sample.csv'
-    team_path = './data/team_info.csv'
-    game_teams_path = './data/game_teams_stats_sample.csv'
+    game_path = './test/data/game_sample.csv'
+    team_path = './test/data/team_info.csv'
+    game_teams_path = './test/data/game_teams_stats_sample.csv'
 
     @locations = {
       games: game_path,

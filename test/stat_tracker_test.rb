@@ -226,7 +226,7 @@ class StatTrackerTest < Minitest::Test
     }
     assert_equal season_summary, stat_tracker.season_summary(20122013, 6)
   end
-# cut
+#
   def test_it_can_determine_most_goals_scored
     stat_tracker = StatTracker.from_csv(@locations)
 
@@ -238,5 +238,51 @@ class StatTrackerTest < Minitest::Test
 
     assert_equal 1, stat_tracker.least_goals_scored(18)
   end
-  # cut
+
+  def test_it_can_determine_favorite_opponent
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "", stat_tracker.favorite_opponent(3)
+  end
+
+  def test_it_can_determine_rival
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "", stat_tracker.rival(3)
+  end
+
+  def test_it_can_determine_biggest_team_blowout
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 3, stat_tracker.biggest_team_blowout(18)
+  end
+
+  def test_it_can_determine_worst_loss
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 2, stat_tracker.worst_loss(18)
+  end
+
+  def test_it_can_give_a_seasonal_summary
+    stat_tracker = StatTracker.from_csv(@locations)
+    hash = {
+      20122013 => {
+        preseason: {
+          win_percentage: 0.0,
+          total_goals_scored: 3,
+          total_goals_against: 5,
+          average_goals_scored: 1.5,
+          average_goals_against: 2.5
+        },
+        regular_season: {
+          win_percentage: 100.0,
+          total_goals_scored: 8,
+          total_goals_against: 6,
+          average_goals_scored: 4.0,
+          average_goals_against: 3.0
+        }
+      }
+    }
+    assert_equal hash, stat_tracker.seasonal_summary(3)
+  end
 end

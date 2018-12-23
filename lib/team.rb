@@ -22,7 +22,13 @@ class Team
                 :preseason_goals_scored,
                 :preseason_goals_against,
                 :regular_goals_scored,
-                :regular_goals_against
+                :regular_goals_against,
+                :preseason_win_percentage,
+                :regular_win_percentage,
+                :preseason_average_goals_scored,
+                :regular_average_goals_scored,
+                :preseason_average_goals_against,
+                :regular_average_goals_against
   def initialize(attribute_array)
     @team_id = attribute_array[0].to_i
     @franchise_id = attribute_array[1].to_i
@@ -48,6 +54,12 @@ class Team
     @preseason_goals_against = 0
     @regular_goals_scored = 0
     @regular_goals_against = 0
+    @preseason_win_percentage = 0
+    @regular_win_percentage = 0
+    @preseason_average_goals_scored = 0
+    @regular_average_goals_scored = 0
+    @preseason_average_goals_against = 0
+    @regular_average_goals_against = 0
   end
 
   def return_team_name_by_id(id)

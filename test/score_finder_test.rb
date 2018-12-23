@@ -1,14 +1,13 @@
 require './test/test_helper'
 require 'minitest/autorun'
 require 'minitest/pride'
-require './lib/score_finder'
 require './lib/stat_tracker'
 
 class ScoreFinderTest < Minitest::Test
   def setup
-    game_path = './data/game_sample.csv'
-    team_path = './data/team_info_sample.csv'
-    game_teams_path = './data/game_teams_stats_sample.csv'
+    game_path = './test/data/game_sample.csv'
+    team_path = './test/data/team_info_sample.csv'
+    game_teams_path = './test/data/game_teams_stats_sample.csv'
 
     @locations = {
       games: game_path,
