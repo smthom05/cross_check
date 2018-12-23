@@ -286,11 +286,11 @@ class StatTracker
       if game.team_id == team_id && game.won? == true
         games_played += 1.0
         games_won += 1.0
-      else game.team_id == team_id && game.won? == false
+      elsif game.team_id == team_id && game.won? == false
         games_played += 1.0
       end
     end
-    average_winrate = games_won / games_played
+    games_won / games_played
   end
 
   def biggest_surprise(season)
@@ -363,4 +363,23 @@ class StatTracker
       regular_season: regular_hash
     }
   end
+# cut
+  def most_goals_scored(team_id)
+    goals_per_game = @game_teams.map do |game|
+      if game.team_id == team_id
+        game.goals
+      end
+    end
+    goals_per_game.compact.max
+  end
+
+  def least_goals_scored(team_id)
+    goals_per_game = @game_teams.map do |game|
+      if game.team_id == team_id
+        game.goals
+      end
+    end
+    goals_per_game.compact.min
+  end
+  # cut
 end

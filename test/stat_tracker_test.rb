@@ -181,12 +181,12 @@ class StatTrackerTest < Minitest::Test
   end
 
 
-  def test_it_can_give_average_winrate
+  def test_it_can_give_average_win_percentage
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 0.25, stat_tracker.average_win_percentage(6)
+    assert_equal 0.50, stat_tracker.average_win_percentage(6)
   end
-  
+
   def test_it_can_determine_biggest_surprise
     stat_tracker = StatTracker.from_csv(@locations)
 
@@ -226,5 +226,17 @@ class StatTrackerTest < Minitest::Test
     }
     assert_equal season_summary, stat_tracker.season_summary(20122013, 6)
   end
+# cut
+  def test_it_can_determine_most_goals_scored
+    stat_tracker = StatTracker.from_csv(@locations)
 
+    assert_equal 6, stat_tracker.most_goals_scored(18)
+  end
+
+  def test_it_can_determine_least_goals_scored
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 1, stat_tracker.least_goals_scored(18)
+  end
+  # cut
 end
