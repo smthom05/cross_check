@@ -2,12 +2,12 @@ require 'csv'
 require './lib/game'
 require './lib/game_teams'
 require './lib/team'
-require './lib/score_finder'
-require './lib/seasons_calculations'
+require './lib/modules/league_stats'
+require './lib/modules/seasons_calculations'
 
 class StatTracker
 
-  include ScoreFinder
+  include LeagueStats
   include SeasonsCalculations
 
   attr_reader :games,
@@ -17,6 +17,7 @@ class StatTracker
     @games = games
     @teams = teams
     @game_teams = game_teams
+    collect_league_stats
   end
 
   def self.from_csv(locations)
@@ -52,22 +53,22 @@ class StatTracker
   end
 
   #method to find season with most games played
-  # def season_with_most_games
-  #   seasons = []
-  #   @games.each do |game|
-  #     seasons << game.season
-  #   end
-  #   (seasons.max_by {|season| seasons.count(season)})
-  # end
+  def season_with_most_games
+    seasons = []
+    @games.each do |game|
+      seasons << game.season
+    end
+    (seasons.max_by {|season| seasons.count(season)})
+  end
 
   #method to find season with fewest games played
-  # def season_with_fewest_games
-  #   seasons = []
-  #   @games.each do |game|
-  #     seasons << game.season
-  #   end
-  #   (seasons.min_by {|season| seasons.count(season)})
-  # end
+  def season_with_fewest_games
+    seasons = []
+    @games.each do |game|
+      seasons << game.season
+    end
+    (seasons.min_by {|season| seasons.count(season)})
+  end
 
   def highest_total_score
     highest_score = 0
@@ -112,39 +113,21 @@ class StatTracker
   end
 
   def percentage_home_wins
-    home_games = []
-    home_wins = []
-    @game_teams.each do |game|
-      if game.hoa == "home"
-        home_games << game
-        if game.won == "TRUE"
-          home_wins << game
-        end
-      end
-    end
-    (home_wins.count.to_f / home_games.count.to_f) * 100.0
+    home_wins = @teams.map {|team| team.home_wins}.sum
+    home_games = @teams.map {|team| team.home_games}.sum
+    (home_wins.to_f / home_games.to_f * 100.00).round(2)
   end
 
   def percentage_visitor_wins
-    visitor_games = []
-    visitor_wins = []
-    @game_teams.each do |game|
-      if game.hoa == "away"
-        visitor_games << game
-        if game.won == "TRUE"
-          visitor_wins << game
-        end
-      end
-    end
-    (visitor_wins.count.to_f / visitor_games.count.to_f) * 100.0
+    visitor_wins = @teams.map {|team| team.away_wins}.sum
+    visitor_games = @teams.map {|team| team.away_games}.sum
+    (visitor_wins.to_f / visitor_games.to_f * 100.0).round(2)
   end
 
   def average_goals_per_game
-    goals_per_game = []
-    @games.each do |game|
-      goals_per_game << (game.away_goals + game.home_goals)
-    end
-    goals_per_game.sum.to_f / goals_per_game.count.to_f
+    total_goals = @teams.map {|team| team.total_goals_scored}.sum
+    total_games = @teams.map {|team| team.home_games}.sum
+    (total_goals.to_f / total_games.to_f).round(2)
   end
 
   def average_goals_by_season
@@ -153,325 +136,145 @@ class StatTracker
       goals_by_season[game.season] += [game.away_goals + game.home_goals]
     end
     goals_by_season.each do |season_id, goals|
-      goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f)
+      goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f).round(2)
     end
     goals_by_season
   end
 
-  def best_offense
-    teams_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_goals = Hash[@teams.map {|team| [team, 0]}]
-
-    @game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_games[team] += 1
-          teams_goals[team] += game.goals.to_f
-        end
-      end
-    end
-
-    teams_avg_goals = teams_goals.merge(teams_games){|key, old, new| Array(old).push(new) }
-    teams_avg_goals.each do |a, b|
-      if b[1] != 0
-        teams_avg_goals[a] = b[0].to_f / b[1].to_f
-      else
-        teams_avg_goals[a] = 0
-      end
-    end
-    best_offensive_team = teams_avg_goals.max_by do |team, gpg|
-      gpg
-    end
-    best_offensive_team[0].team_name
+  def highest_scoring_home_team
+    average_home_scores = @teams.map {|team| team.home_goals_scored.to_f / team.home_games.to_f}
+    index = average_home_scores.each_with_index.max[1]
+    @teams[index].team_name
   end
 
+  def lowest_scoring_home_team
+    average_home_scores = @teams.map {|team| team.home_goals_scored.to_f / team.home_games.to_f}
+    index = average_home_scores.each_with_index.min[1]
+    @teams[index].team_name
+  end
+
+  def highest_scoring_visitor
+    average_away_scores = @teams.map {|team| team.away_goals_scored.to_f / team.away_games.to_f}
+    index = average_away_scores.each_with_index.max[1]
+    @teams[index].team_name
+  end
+
+  def lowest_scoring_visitor
+    average_away_scores = @teams.map {|team| team.away_goals_scored.to_f / team.away_games.to_f}
+    index = average_away_scores.each_with_index.min[1]
+    @teams[index].team_name
+  end
+
+  def best_offense
+    goals_scored = @teams.map {|team| team.total_goals_scored}
+    games_played = @teams.map {|team| team.total_games}
+    goals_and_games = goals_scored.zip(games_played)
+    average_goals = goals_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    index = average_goals.each_with_index.max[1]
+    @teams[index].team_name
+  end
+  #
   def worst_offense
-    teams_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_goals = Hash[@teams.map {|team| [team, 0]}]
-
-    @game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_games[team] += 1
-          teams_goals[team] += game.goals.to_f
-        end
-      end
-    end
-
-    teams_avg_goals = teams_goals.merge(teams_games){|key, old, new| Array(old).push(new) }
-    teams_avg_goals.each do |a, b|
-      if b[1] != 0
-        teams_avg_goals[a] = b[0].to_f / b[1].to_f
-      else
-        teams_avg_goals[a] = 0
-      end
-    end
-
-    worst_offensive_team = teams_avg_goals.min_by do |team, gpg|
-      gpg
-    end
-    worst_offensive_team[0].team_name
+    goals_scored = @teams.map {|team| team.total_goals_scored}
+    games_played = @teams.map {|team| team.total_games}
+    goals_and_games = goals_scored.zip(games_played)
+    average_goals = goals_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    index = average_goals.each_with_index.min[1]
+    @teams[index].team_name
   end
 
   def best_defense
-    teams_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_goals_against = Hash[@teams.map {|team| [team, 0]}]
-
-    @game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_games[team] += 1
-        end
-      end
-    end
-
-    @games.each do |game|
-      @teams.each do |team|
-        if game.away_team_id == team.team_id
-          teams_goals_against[team] += game.home_goals
-        elsif game.home_team_id == team.team_id
-          teams_goals_against[team] += game.away_goals
-        end
-      end
-    end
-    teams_avg_goals_against = teams_goals_against.merge(teams_games){|key, old, new| Array(old).push(new) }
-    teams_avg_goals_against.each do |a, b|
-      if b[1] != 0
-        teams_avg_goals_against[a] = b[0].to_f / b[1].to_f
-      else
-        teams_avg_goals_against[a] = 0
-      end
-    end
-    best_defensive_team = teams_avg_goals_against.min_by do |team, gpg_against|
-      gpg_against
-    end
-    best_defensive_team[0].team_name
+    goals_allowed = @teams.map {|team| team.total_goals_allowed}
+    games_played = @teams.map {|team| team.total_games}
+    goals_allowed_and_games = goals_allowed.zip(games_played)
+    average_goals_allowed = goals_allowed_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    index = average_goals_allowed.each_with_index.min[1]
+    @teams[index].team_name
   end
 
   def worst_defense
-    teams_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_goals_against = Hash[@teams.map {|team| [team, 0]}]
-
-    @game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_games[team] += 1
-        end
-      end
-    end
-
-    @games.each do |game|
-      @teams.each do |team|
-        if game.away_team_id == team.team_id
-          teams_goals_against[team] += game.home_goals
-        elsif game.home_team_id == team.team_id
-          teams_goals_against[team] += game.away_goals
-        end
-      end
-    end
-    teams_avg_goals_against = teams_goals_against.merge(teams_games){|key, old, new| Array(old).push(new) }
-    teams_avg_goals_against.each do |a, b|
-      if b[1] != 0
-        teams_avg_goals_against[a] = b[0].to_f / b[1].to_f
-      else
-        teams_avg_goals_against[a] = 0
-      end
-    end
-    worst_defensive_team = teams_avg_goals_against.max_by do |team, gpg_against|
-      gpg_against
-    end
-    worst_defensive_team[0].team_name
+    goals_allowed = @teams.map {|team| team.total_goals_allowed}
+    games_played = @teams.map {|team| team.total_games}
+    goals_allowed_and_games = goals_allowed.zip(games_played)
+    average_goals_allowed = goals_allowed_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    index = average_goals_allowed.each_with_index.max[1]
+    @teams[index].team_name
   end
 
   def count_of_teams
     @teams.count
   end
 
-
   def winningest_team
-    teams_and_number_of_wins = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_total_games = Hash[@teams.map {|team| [team, 0]}]
-    @game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_and_total_games[team] += 1
-          if game.won == "TRUE"
-            teams_and_number_of_wins[team] += 1
-          end
-        end
-      end
-    end
-    wins_and_games = teams_and_number_of_wins.merge(teams_and_total_games){|key, old, new| Array(old).push(new) }
-    wins_and_games.each do |team, pair|
-      if pair[1] != 0
-        wins_and_games[team] = (pair[0].to_f / pair[1].to_f)
-      else wins_and_games[team] = 0
-      end
-    end
-    wins_and_games.max_by{|team, win_percentage| win_percentage}[0].team_name
+    number_of_wins = @teams.map {|team| team.total_wins}
+    games_played = @teams.map {|team| team.total_games}
+    wins_and_games = number_of_wins.zip(games_played)
+    win_percentage = wins_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    index = win_percentage.each_with_index.max[1]
+    @teams[index].team_name
   end
 
   def best_fans
-    teams_and_total_home_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_total_away_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_home_wins = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_away_wins = Hash[@teams.map {|team| [team, 0]}]
-    @game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id && game.hoa == "away"
-          teams_and_total_away_games[team] += 1
-          if game.won == "TRUE"
-            teams_and_away_wins[team] += 1
-          end
-        elsif team.team_id == game.team_id && game.hoa == "home"
-          teams_and_total_home_games[team] += 1
-            if game.won == "TRUE"
-              teams_and_home_wins[team] += 1
-            end
-        end
-      end
-    end
-    home_wins_and_games = teams_and_home_wins.merge(teams_and_total_home_games){|key, old, new| Array(old).push(new)}
-    away_wins_and_games = teams_and_away_wins.merge(teams_and_total_away_games){|key, old, new| Array(old).push(new)}
-    home_wins_and_games.each do |team, pair|
-      if pair[1] != 0
-        home_wins_and_games[team] = (pair[0].to_f / pair[1].to_f)
-      else home_wins_and_games[team] = 0
-      end
-    end
-    away_wins_and_games.each do |team, pair|
-      if pair[1] != 0
-        away_wins_and_games[team] = (pair[0].to_f / pair[1].to_f)
-      else away_wins_and_games[team] = 0
-      end
-    end
-    home_and_away_win_percentage = home_wins_and_games.merge(away_wins_and_games){|key, old, new| Array(old).push(new)}
-    home_and_away_win_percentage.each do |team, pair|
-      home_and_away_win_percentage[team] = (pair[0] - pair[1])
-    end
-    home_and_away_win_percentage.max_by{|team, win_percentage| win_percentage}[0].team_name
+    home_wins = @teams.map {|team| team.home_wins}
+    home_games = @teams.map {|team| team.home_games}
+    away_wins = @teams.map {|team| team.away_wins}
+    away_games = @teams.map {|team| team.away_games}
+    home_wins_and_games = home_wins.zip(home_games)
+    away_wins_and_games = away_wins.zip(away_games)
+    home_win_percentage = home_wins_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    away_win_percentage = away_wins_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    home_and_away_win_percentage = home_win_percentage.zip(away_win_percentage)
+    win_percentage_difference = home_and_away_win_percentage.map {|pair| pair[0].to_f - pair[1].to_f}
+    index = win_percentage_difference.each_with_index.max[1]
+    @teams[index].team_name
   end
 
   def worst_fans
-    teams_and_total_home_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_total_away_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_home_wins = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_away_wins = Hash[@teams.map {|team| [team, 0]}]
-    @game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id && game.hoa == "away"
-          teams_and_total_away_games[team] += 1
-          if game.won == "TRUE"
-            teams_and_away_wins[team] += 1
-          end
-        elsif team.team_id == game.team_id && game.hoa == "home"
-          teams_and_total_home_games[team] += 1
-            if game.won == "TRUE"
-              teams_and_home_wins[team] += 1
-            end
-        end
+    home_wins = @teams.map {|team| team.home_wins}
+    home_games = @teams.map {|team| team.home_games}
+    away_wins = @teams.map {|team| team.away_wins}
+    away_games = @teams.map {|team| team.away_games}
+    home_wins_and_games = home_wins.zip(home_games)
+    away_wins_and_games = away_wins.zip(away_games)
+    home_win_percentage = home_wins_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    away_win_percentage = away_wins_and_games.map {|pair| pair[0].to_f / pair[1].to_f}
+    away_and_home_win_percentage = away_win_percentage.zip(home_win_percentage)
+    win_percentage_difference = away_and_home_win_percentage.map {|pair| pair[0].to_f - pair[1].to_f}
+    indexes_of_teams_with_bad_fans = []
+    win_percentage_difference.each_with_index do |percentage, index|
+      if percentage > 0
+        indexes_of_teams_with_bad_fans << index
       end
     end
-    home_wins_and_games = teams_and_home_wins.merge(teams_and_total_home_games){|key, old, new| Array(old).push(new)}
-    away_wins_and_games = teams_and_away_wins.merge(teams_and_total_away_games){|key, old, new| Array(old).push(new)}
-    home_wins_and_games.each do |team, pair|
-      if pair[1] != 0
-        home_wins_and_games[team] = (pair[0].to_f / pair[1].to_f)
-      else home_wins_and_games[team] = 0
-      end
-    end
-    away_wins_and_games.each do |team, pair|
-      if pair[1] != 0
-        away_wins_and_games[team] = (pair[0].to_f / pair[1].to_f)
-      else away_wins_and_games[team] = 0
-      end
-    end
-    away_and_home_win_percentage = away_wins_and_games.merge(home_wins_and_games){|key, old, new| Array(old).push(new)}
-    away_and_home_win_percentage.each do |team, pair|
-      away_and_home_win_percentage[team] = (pair[0] - pair[1])
-    end
-    worst_fans = away_and_home_win_percentage.select do |team, percentage|
-      percentage > 0
-    end
-
-    worst_fans.keys
+    indexes_of_teams_with_bad_fans.map {|index| @teams[index].team_name}
   end
 
   def biggest_bust(season)
-    teams_and_preseason_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_regular_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_preseason_wins = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_regular_wins = Hash[@teams.map {|team| [team, 0]}]
-    preseason_games = []
-    regular_games = []
-    @games.each do |game|
-      if game.season == season && game.type == "P"
-        preseason_games << game
-      elsif game.season == season && game.type == "R"
-        regular_games << game
+    collect_season_stats(season)
+    preseason_games = teams.map {|team| team.preseason_games}
+    preseason_wins = teams.map {|team| team.preseason_wins}
+    regular_games = teams.map {|team| team.regular_games}
+    regular_wins = teams.map {|team|team.regular_wins}
+    preseason_wins_and_games = preseason_wins.zip(preseason_games)
+    regular_wins_and_games = regular_wins.zip(regular_games)
+    preseason_win_percentage = preseason_wins_and_games.map do |pair|
+      if pair[1] == 0
+        0
+      else
+        pair[0].to_f / pair[1].to_f
       end
     end
-    preseason_game_ids = preseason_games.map do |game|
-      game.game_id
-    end
-    regular_game_ids = regular_games.map do |game|
-      game.game_id
-    end
-
-    preseason_game_teams = []
-    @game_teams.each do |game|
-      if preseason_game_ids.include?(game.game_id)
-        preseason_game_teams << game
+    regular_win_percentage = regular_wins_and_games.map do |pair|
+      if pair[1] == 0
+        0
+      else
+        pair[0].to_f / pair[1].to_f
       end
     end
-    regular_game_teams = []
-    @game_teams.each do |game|
-      if regular_game_ids.include?(game.game_id)
-        regular_game_teams << game
-      end
-    end
-    preseason_game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_and_preseason_games[team] += 1
-          if game.won == "TRUE"
-            teams_and_preseason_wins[team] += 1
-          end
-        end
-      end
-    end
-    regular_game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_and_regular_games[team] += 1
-          if game.won == "TRUE"
-            teams_and_regular_wins[team] += 1
-          end
-        end
-      end
-    end
-    preseason_win_percentage = teams_and_preseason_wins.merge(teams_and_preseason_games){|key, old, new| Array(old).push(new)}
-    regular_win_percentage = teams_and_regular_wins.merge(teams_and_regular_games){|key, old, new| Array(old).push(new)}
-    preseason_win_percentage.each do |team, pair|
-      if pair[1] != 0
-        preseason_win_percentage[team] = (pair[0].to_f / pair[1].to_f)
-      else preseason_win_percentage[team] = 0
-      end
-    end
-    regular_win_percentage.each do |team, pair|
-      if pair[1] != 0
-        regular_win_percentage[team] = (pair[0].to_f / pair[1].to_f)
-      else regular_win_percentage[team] = 0
-      end
-    end
-    biggest_bust = regular_win_percentage.merge(preseason_win_percentage){|key, old, new| Array(old).push(new)}
-    biggest_bust.each do |team, pair|
-      if pair[1] != 0 && pair[0] != 0
-        biggest_bust[team] = (pair[0].to_f - pair[1].to_f)
-      else biggest_bust[team] = 0
-      end
-    end
-    biggest_bust.max_by{|team, win_percentage_difference| win_percentage_difference}[0].team_name
+    preseason_and_regular_win_percentage = preseason_win_percentage.zip(regular_win_percentage)
+    biggest_bust = preseason_and_regular_win_percentage.map {|pair| pair[0] - pair[1]}
+    biggest_bust_index = biggest_bust.each_with_index.max[1]
+    @teams[biggest_bust_index].team_name
   end
 
 
@@ -489,84 +292,33 @@ class StatTracker
     end
     average_winrate = games_won / games_played
   end
-     
+
   def biggest_surprise(season)
-    teams_and_preseason_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_regular_games = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_preseason_wins = Hash[@teams.map {|team| [team, 0]}]
-    teams_and_regular_wins = Hash[@teams.map {|team| [team, 0]}]
-
-    preseason_games = []
-    regular_games = []
-    @games.each do |game|
-      if game.season == season && game.type == "P"
-        preseason_games << game
-      elsif game.season == season && game.type == "R"
-        regular_games << game
+    collect_season_stats(season)
+    preseason_games = teams.map {|team| team.preseason_games}
+    preseason_wins = teams.map {|team| team.preseason_wins}
+    regular_games = teams.map {|team| team.regular_games}
+    regular_wins = teams.map {|team|team.regular_wins}
+    preseason_wins_and_games = preseason_wins.zip(preseason_games)
+    regular_wins_and_games = regular_wins.zip(regular_games)
+    preseason_win_percentage = preseason_wins_and_games.map do |pair|
+      if pair[1] == 0
+        0
+      else
+        pair[0].to_f / pair[1].to_f
       end
     end
-    preseason_game_ids = preseason_games.map do |game|
-      game.game_id
-    end
-    regular_game_ids = regular_games.map do |game|
-      game.game_id
-    end
-
-    preseason_game_teams = []
-    @game_teams.each do |game|
-      if preseason_game_ids.include?(game.game_id)
-        preseason_game_teams << game
+    regular_win_percentage = regular_wins_and_games.map do |pair|
+      if pair[1] == 0
+        0
+      else
+        pair[0].to_f / pair[1].to_f
       end
     end
-    regular_game_teams = []
-    @game_teams.each do |game|
-      if regular_game_ids.include?(game.game_id)
-        regular_game_teams << game
-      end
-    end
-
-    preseason_game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_and_preseason_games[team] += 1
-          if game.won == "TRUE"
-            teams_and_preseason_wins[team] += 1
-          end
-        end
-      end
-    end
-    regular_game_teams.each do |game|
-      @teams.each do |team|
-        if team.team_id == game.team_id
-          teams_and_regular_games[team] += 1
-          if game.won == "TRUE"
-            teams_and_regular_wins[team] += 1
-          end
-        end
-      end
-    end
-    preseason_win_percentage = teams_and_preseason_wins.merge(teams_and_preseason_games){|key, old, new| Array(old).push(new)}
-    regular_win_percentage = teams_and_regular_wins.merge(teams_and_regular_games){|key, old, new| Array(old).push(new)}
-    preseason_win_percentage.each do |team, pair|
-      if pair[1] != 0
-        preseason_win_percentage[team] = (pair[0].to_f / pair[1].to_f)
-      else preseason_win_percentage[team] = 0
-      end
-    end
-    regular_win_percentage.each do |team, pair|
-      if pair[1] != 0
-        regular_win_percentage[team] = (pair[0].to_f / pair[1].to_f)
-      else regular_win_percentage[team] = 0
-      end
-    end
-    biggest_surprise = regular_win_percentage.merge(preseason_win_percentage){|key, old, new| Array(old).push(new)}
-    biggest_surprise.each do |team, pair|
-      if pair[1] != 0 && pair[0] != 0
-        biggest_surprise[team] = (pair[1].to_f - pair[0].to_f)
-      else biggest_surprise[team] = 0
-      end
-    end
-    biggest_surprise.max_by{|team, win_percentage_difference| win_percentage_difference}[0].team_name
+    regular_and_preseason_win_percentage = regular_win_percentage.zip(preseason_win_percentage)
+    biggest_surprise = regular_and_preseason_win_percentage.map {|pair| pair[0] - pair[1]}
+    biggest_surprise_index = biggest_surprise.each_with_index.max[1]
+    @teams[biggest_surprise_index].team_name
   end
 
   def team_info(team_id)
@@ -583,70 +335,32 @@ class StatTracker
     end
     team_info_hash
   end
-  
-  def season_summary(season, team_id)
-    preseason_wins = 0
-    preseason_games = 0
-    preseason_goals_scored = 0
-    preseason_goals_against = 0
-    regular_wins = 0
-    regular_games = 0
-    regular_goals_scored = 0
-    regular_goals_against = 0
 
-    @games.each do |game|
-      # require 'pry'; binding.pry
-      if game.season == season && game.away_team_id == team_id
-        if game.type == "P"
-          preseason_games += 1
-          preseason_goals_scored += game.away_goals
-          preseason_goals_against += game.home_goals
-          if game.away_goals > game.home_goals
-            preseason_wins += 1
-          end
-        elsif game.type == "R"
-          regular_games += 1
-          regular_goals_scored += game.away_goals
-          regular_goals_against += game.home_goals
-          if game.away_goals > game.home_goals
-            regular_wins += 1
-          end
-        end
-      end
-      if game.season == season && game.home_team_id == team_id
-        if game.type == "P"
-          preseason_games += 1
-          preseason_goals_scored += game.home_goals
-          preseason_goals_against += game.away_goals
-          if game.home_goals > game.away_goals
-            preseason_wins += 1
-          end
-        elsif game.type == "R"
-          regular_games += 1
-          regular_goals_scored += game.home_goals
-          regular_goals_against += game.away_goals
-          if game.home_goals > game.away_goals
-            regular_wins += 1
-          end
-        end
+  def season_summary(season, team_id)
+    collect_season_stats(season)
+    team = ""
+    @teams.each do |each_team|
+      if each_team.team_id == team_id
+        team = each_team
       end
     end
-    regular_win_percentage = (regular_wins.to_f / regular_games.to_f) * 100.0
-    preseason_win_percentage = (preseason_wins.to_f / preseason_games.to_f) * 100.0
+
+    preseason_win_percentage = team.preseason_wins.to_f / team.preseason_games.to_f * 100.0
+    regular_win_percentage = team.regular_wins.to_f / team.regular_games.to_f * 100.0
+
     preseason_hash = {
       win_percentage: preseason_win_percentage,
-      goals_scored: preseason_goals_scored,
-      goals_against: preseason_goals_against
+      goals_scored: team.preseason_goals_scored,
+      goals_against: team.preseason_goals_against
     }
     regular_hash = {
       win_percentage: regular_win_percentage,
-      goals_scored: regular_goals_scored,
-      goals_against: regular_goals_against
+      goals_scored: team.regular_goals_scored,
+      goals_against: team.regular_goals_against
     }
     {
       preseason: preseason_hash,
       regular_season: regular_hash
     }
   end
-
 end
