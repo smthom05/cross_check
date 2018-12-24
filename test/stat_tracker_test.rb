@@ -1,6 +1,5 @@
 require './test/test_helper'
 require './lib/stat_tracker'
-require './lib/modules/score_finder'
 require './lib/modules/league_stats'
 
 class StatTrackerTest < Minitest::Test
@@ -242,13 +241,13 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_favorite_opponent
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal "", stat_tracker.favorite_opponent(3)
+    assert_equal "Bruins", stat_tracker.favorite_opponent(3)
   end
 
   def test_it_can_determine_rival
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal "", stat_tracker.rival(3)
+    assert_equal "Bruins", stat_tracker.rival(3)
   end
 
   def test_it_can_determine_biggest_team_blowout
