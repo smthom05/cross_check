@@ -21,124 +21,88 @@ class StatTracker
   end
 
   def self.from_csv(locations)
-    all_games = CSV.readlines(locations[:games])[1..-1].map do |game|
-      Game.new(game)
-    end
-    all_game_teams = CSV.readlines(locations[:game_teams])[1..-1].map do |game|
-      GameTeams.new(game)
-    end
-    all_teams = CSV.readlines(locations[:teams])[1..-1].map do |team|
-      Team.new(team)
-    end
+    all_games = CSV.readlines(locations[:games])[1..-1].map {|game| Game.new(game)}
+    all_game_teams = CSV.readlines(locations[:game_teams])[1..-1].map {|game| GameTeams.new(game)}
+    all_teams = CSV.readlines(locations[:teams])[1..-1].map {|team| Team.new(team)}
     StatTracker.new(all_games, all_teams, all_game_teams)
   end
 
-
-  # method to find venue with most games played
-  def most_popular_venue
-    venues = []
-    @games.each do |game|
-      venues << game.venue
-    end
-    venues.max_by {|venue| venues.count(venue)}
-  end
-
-  # method to find venue with least games played
-  def least_popular_venue
-    venues = []
-    @games.each do |game|
-      venues << game.venue
-    end
-    venues.min_by {|venue| venues.count(venue)}
-  end
-
-  #method to find season with most games played
-  def season_with_most_games
-    seasons = []
-    @games.each do |game|
-      seasons << game.season
-    end
-    (seasons.max_by {|season| seasons.count(season)})
-  end
-
-  #method to find season with fewest games played
-  def season_with_fewest_games
-    seasons = []
-    @games.each do |game|
-      seasons << game.season
-    end
-    (seasons.min_by {|season| seasons.count(season)})
-  end
-
+  # returns highest sum of the winning and losing teams’ scores
   def highest_total_score
-    highest_score = 0
-    games.each do |game|
-      current_score = game.away_goals + game.home_goals
-        if current_score > highest_score
-          highest_score = current_score
-        end
-    end
-    highest_score
+    total_game_scores = games.map { |game| game.home_goals + game.away_goals}
+    total_game_scores.max
   end
 
+  # returns lowest sum of the winning and losing teams' scores
   def lowest_total_score
-    lowest_score = 0
-    games.each do |game|
-      current_score = game.away_goals + game.home_goals
-        if current_score < lowest_score
-          lowest_score = current_score
-        end
-    end
-    lowest_score
+    total_game_scores = games.map { |game| game.home_goals + game.away_goals}
+    total_game_scores.min
   end
 
+  # returns highest score difference
   def biggest_blowout
-    blowout = 0
-    games.each do |game|
-      score_difference = (game.away_goals..game.home_goals).to_a.count - 1
-        if score_difference > blowout
-          blowout = score_difference
-        end
-    end
-    blowout
+    score_difference = games.map { |game| (game.home_goals - game.away_goals).abs}
+    score_difference.max
   end
 
-  def count_of_games_by_season
-    seasons_hash = @games.group_by do |game|
-      game.season
-    end
-    seasons_hash.each do |season, value|
-      seasons_hash[season] = value.count
-    end
+  # returns venue with most games played
+  def most_popular_venue
+    venues = @games.map { |game| game.venue }
+    venues.max_by { |venue| venues.count(venue) }
   end
 
+  # returns venue with least games played
+  def least_popular_venue
+    venues = @games.map { |game| game.venue }
+    venues.min_by { |venue| venues.count(venue) }
+  end
+
+  # returns percentage of games a home team has won
   def percentage_home_wins
     home_wins = @teams.map {|team| team.home_wins}.sum
     home_games = @teams.map {|team| team.home_games}.sum
     (home_wins.to_f / home_games.to_f * 100.00).round(2)
   end
 
+  # returns percentage of games an away team has won
   def percentage_visitor_wins
     visitor_wins = @teams.map {|team| team.away_wins}.sum
     visitor_games = @teams.map {|team| team.away_games}.sum
     (visitor_wins.to_f / visitor_games.to_f * 100.0).round(2)
   end
 
+  # returns season with most games played
+  def season_with_most_games
+    seasons = @games.map { |game| game.season }
+    seasons.max_by { |season| seasons.count(season) }
+  end
+
+  # returns season with fewest games played
+  def season_with_fewest_games
+    seasons = @games.map { |game| game.season }
+    seasons.min_by { |season| seasons.count(season) }
+  end
+
+  # returns a hash with season names as keys and counts of games as values
+  def count_of_games_by_season
+    games_by_season = @games.group_by { |game| game.season }
+    games_by_season.each { |season, games| games_by_season[season] = games.count }
+  end
+
+  # returns average number of goals scored in a game across all seasons
   def average_goals_per_game
     total_goals = @teams.map {|team| team.total_goals_scored}.sum
     total_games = @teams.map {|team| team.home_games}.sum
     (total_goals.to_f / total_games.to_f).round(2)
   end
 
+  # returns a hash with season names as keys and average goals that season as a value
   def average_goals_by_season
-    goals_by_season = Hash.new([])
-    @games.each do |game|
-      goals_by_season[game.season] += [game.away_goals + game.home_goals]
+    goals_by_season = @games.group_by { |game| game.season }
+    goals_by_season.each do |season, games|
+      season_goals = games.map { |game| game.home_goals + game.away_goals }.sum
+      goals_by_season[season] = season_goals.to_f / games.count.to_f
     end
-    goals_by_season.each do |season_id, goals|
-      goals_by_season[season_id] = (goals.sum.to_f / goals.count.to_f).round(2)
-    end
-    goals_by_season
   end
 
   def highest_scoring_home_team

@@ -21,6 +21,24 @@ class StatTrackerTest < Minitest::Test
     assert_instance_of StatTracker, stat_tracker
   end
 
+  def test_it_can_determine_highest_total_score
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 9, stat_tracker.highest_total_score
+  end
+
+  def test_it_can_determine_lowest_total_score
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 3, stat_tracker.lowest_total_score
+  end
+
+  def test_it_can_determine_biggest_blowout
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 3, stat_tracker.biggest_blowout
+  end
+
   def test_it_can_determine_most_popular_venue
     stat_tracker = StatTracker.from_csv(@locations)
 
@@ -31,6 +49,18 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
 
     assert_equal "TD Garden", stat_tracker.least_popular_venue
+  end
+
+  def test_it_can_determine_percentage_home_wins
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 75.0, stat_tracker.percentage_home_wins
+  end
+
+  def test_it_can_determine_percentage_visitor_wins
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 25.0, stat_tracker.percentage_visitor_wins
   end
 
   def test_it_can_determine_season_with_most_games
@@ -47,41 +77,12 @@ class StatTrackerTest < Minitest::Test
     assert_equal 20122013, stat_tracker.season_with_fewest_games
   end
 
-  def test_it_can_determine_highest_total_score
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal 9, stat_tracker.highest_total_score
-  end
-
-  def test_it_can_determine_lowest_total_score
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal 0, stat_tracker.lowest_total_score
-  end
-
-  def test_it_can_determine_biggest_blowout
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal 3, stat_tracker.biggest_blowout
-  end
-
   def test_it_can_determine_games_by_season
     stat_tracker = StatTracker.from_csv(@locations)
 
     assert_equal ({20122013=>4, 20162017=>4}), stat_tracker.count_of_games_by_season
   end
 
-  def test_it_can_determine_percentage_home_wins
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal 75.0, stat_tracker.percentage_home_wins
-  end
-
-  def test_it_can_determine_percentage_visitor_wins
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal 25.0, stat_tracker.percentage_visitor_wins
-  end
 
   def test_it_can_determine_average_goals_per_game
     stat_tracker = StatTracker.from_csv(@locations)
