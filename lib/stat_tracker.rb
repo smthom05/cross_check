@@ -3,12 +3,10 @@ require './lib/game'
 require './lib/game_teams'
 require './lib/team'
 require './lib/modules/league_stats'
-require './lib/modules/seasons_calculations'
 
 class StatTracker
 
   include LeagueStats
-  include SeasonsCalculations
 
   attr_reader :games,
               :teams,
