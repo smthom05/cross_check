@@ -13,6 +13,7 @@ module LeagueStats
   end
 
   def collect_season_stats(season)
+    clear_season_stats(@teams)
     @games.each do |game|
       @teams.each do |team|
         if game.home_team_id == team.team_id && game.season == season
@@ -30,6 +31,7 @@ module LeagueStats
         end
       end
     end
+    calculate_season_statistics(@teams)
   end
 
 
@@ -90,6 +92,36 @@ module LeagueStats
     team.regular_goals_against += game.home_goals
     if game.away_goals > game.home_goals
       team.regular_wins += 1
+    end
+  end
+
+  def calculate_season_statistics(teams)
+    teams.each do |team|
+      team.preseason_win_percentage = team.preseason_wins.to_f / team.preseason_games.to_f * 100.0
+      team.regular_win_percentage = team.regular_wins.to_f / team.regular_games.to_f * 100.0
+      team.preseason_average_goals_scored = team.preseason_goals_scored.to_f / team.preseason_games.to_f
+      team.regular_average_goals_scored = team.regular_goals_scored.to_f / team.regular_games.to_f
+      team.preseason_average_goals_against = team.preseason_goals_against.to_f / team.preseason_games.to_f
+      team.regular_average_goals_against = team.regular_goals_against.to_f / team.regular_games.to_f
+    end
+  end
+
+  def clear_season_stats(teams)
+    teams.each do |team|
+      team.preseason_games = 0
+      team.preseason_wins = 0
+      team.regular_games = 0
+      team.regular_wins = 0
+      team.preseason_goals_scored = 0
+      team.preseason_goals_against = 0
+      team.regular_goals_scored = 0
+      team.regular_goals_against = 0
+      team.preseason_win_percentage = 0
+      team.regular_win_percentage = 0
+      team.preseason_average_goals_scored = 0
+      team.regular_average_goals_scored = 0
+      team.preseason_average_goals_against = 0
+      team.regular_average_goals_against = 0
     end
   end
 end

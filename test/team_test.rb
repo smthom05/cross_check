@@ -4,9 +4,9 @@ require './lib/team'
 
 class TeamTest < Minitest::Test
   def setup
-    game_path = './data/game_sample.csv'
-    team_path = './data/team_info.csv'
-    game_teams_path = './data/game_teams_stats_sample.csv'
+    game_path = './test/data/game_sample.csv'
+    team_path = './test/data/team_info_sample.csv'
+    game_teams_path = './test/data/game_teams_stats_sample.csv'
 
     @locations = {
       games: game_path,
@@ -26,11 +26,11 @@ class TeamTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
     team = stat_tracker.teams[0]
 
-    assert_equal 1, team.team_id
-    assert_equal 23, team.franchise_id
-    assert_equal "New Jersey", team.short_name
-    assert_equal "Devils", team.team_name
-    assert_equal "NJD", team.abbreviation
-    assert_equal "/api/v1/teams/1", team.link
+    assert_equal 3, team.team_id
+    assert_equal 10, team.franchise_id
+    assert_equal "NY Rangers", team.short_name
+    assert_equal "Rangers", team.team_name
+    assert_equal "NYR", team.abbreviation
+    assert_equal "/api/v1/teams/3", team.link
   end
 end
