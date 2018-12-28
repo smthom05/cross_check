@@ -108,20 +108,7 @@ module LeagueStats
 
   def clear_season_stats(teams)
     teams.each do |team|
-      team.preseason_games = 0
-      team.preseason_wins = 0
-      team.regular_games = 0
-      team.regular_wins = 0
-      team.preseason_goals_scored = 0
-      team.preseason_goals_against = 0
-      team.regular_goals_scored = 0
-      team.regular_goals_against = 0
-      team.preseason_win_percentage = 0
-      team.regular_win_percentage = 0
-      team.preseason_average_goals_scored = 0
-      team.regular_average_goals_scored = 0
-      team.preseason_average_goals_against = 0
-      team.regular_average_goals_against = 0
+      team.reset
     end
   end
 end

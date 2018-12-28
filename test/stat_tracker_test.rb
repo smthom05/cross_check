@@ -285,4 +285,15 @@ class StatTrackerTest < Minitest::Test
     }
     assert_equal hash, stat_tracker.seasonal_summary(3)
   end
+
+  def test_it_can_give_head_to_head
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    expected = {
+      wins: 2,
+      losses: 2
+    }
+
+    assert_equal expected, stat_tracker.head_to_head(3, 6)
+  end
 end

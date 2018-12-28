@@ -61,4 +61,21 @@ class Team
     @preseason_average_goals_against = 0
     @regular_average_goals_against = 0
   end
+
+  def reset
+    @preseason_games = 0
+    @preseason_wins = 0
+    @regular_games = 0
+    @regular_wins = 0
+    @preseason_goals_scored = 0
+    @preseason_goals_against = 0
+    @regular_goals_scored = 0
+    @regular_goals_against = 0
+    @preseason_win_percentage = 0
+    @regular_win_percentage = 0
+    @preseason_average_goals_scored = 0
+    @regular_average_goals_scored = 0
+    @preseason_average_goals_against = 0
+    @regular_average_goals_against = 0
+  end
 end
