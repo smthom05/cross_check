@@ -564,6 +564,15 @@ class StatTracker
       best_season
   end
 
-  def worst_season
+  def worst_season(team_id)
+    team_seasonal_summary = seasonal_summary(team_id)
+    worst_season = seasonal_summary(team_id).keys.first
+    team_seasonal_summary.each do |season, stats|
+      if stats[:regular_season][:win_percentage] < team_seasonal_summary[worst_season][:regular_season][:win_percentage]
+        worst_season = season
+      end
+    end
+      worst_season
   end
+
 end
