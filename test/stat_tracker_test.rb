@@ -54,33 +54,33 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_percentage_home_wins
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 75.0, stat_tracker.percentage_home_wins
+    assert_equal 0.75, stat_tracker.percentage_home_wins
   end
 
   def test_it_can_determine_percentage_visitor_wins
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 25.0, stat_tracker.percentage_visitor_wins
+    assert_equal 0.25, stat_tracker.percentage_visitor_wins
   end
 
   def test_it_can_determine_season_with_most_games
     stat_tracker = StatTracker.from_csv(@locations)
 
     #full csv gives back 20172018
-    assert_equal 20122013, stat_tracker.season_with_most_games
+    assert_equal "20122013", stat_tracker.season_with_most_games
   end
 
   def test_it_can_determine_season_with_fewest_games
     stat_tracker = StatTracker.from_csv(@locations)
 
     #full csv gives back 20122013
-    assert_equal 20122013, stat_tracker.season_with_fewest_games
+    assert_equal "20122013", stat_tracker.season_with_fewest_games
   end
 
   def test_it_can_determine_games_by_season
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal ({20122013=>4, 20162017=>4}), stat_tracker.count_of_games_by_season
+    assert_equal ({"20122013"=>4, "20162017"=>4}), stat_tracker.count_of_games_by_season
   end
 
 
@@ -92,7 +92,7 @@ class StatTrackerTest < Minitest::Test
 
   def test_it_can_determine_average_goals_by_season
     stat_tracker = StatTracker.from_csv(@locations)
-    hash = {20122013=>5.5, 20162017=>5.5}
+    hash = {"20122013"=>5.5, "20162017"=>5.5}
 
     assert_equal hash, stat_tracker.average_goals_by_season
   end
@@ -213,7 +213,7 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
     season_summary = {
       preseason: {
-        win_percentage: 100.0,
+        win_percentage: 1.0,
         goals_scored: 5,
         goals_against: 3
       },
@@ -223,7 +223,7 @@ class StatTrackerTest < Minitest::Test
         goals_against: 8
       }
     }
-    assert_equal season_summary, stat_tracker.season_summary(20122013, 6)
+    assert_equal season_summary, stat_tracker.season_summary("20122013", "6")
   end
 #
   def test_it_can_determine_most_goals_scored
@@ -232,10 +232,10 @@ class StatTrackerTest < Minitest::Test
     assert_equal 6, stat_tracker.most_goals_scored(18)
   end
 
-  def test_it_can_determine_least_goals_scored
+  def test_it_can_determine_fewest_goals_scored
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 1, stat_tracker.least_goals_scored(18)
+    assert_equal 1, stat_tracker.fewest_goals_scored(18)
   end
 
   def test_it_can_determine_favorite_opponent
@@ -253,13 +253,13 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_biggest_team_blowout
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 3, stat_tracker.biggest_team_blowout(18)
+    assert_equal 3, stat_tracker.biggest_team_blowout("18")
   end
 
   def test_it_can_determine_worst_loss
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 2, stat_tracker.worst_loss(18)
+    assert_equal 2, stat_tracker.worst_loss("18")
   end
 
   def test_it_can_give_a_seasonal_summary
@@ -313,6 +313,7 @@ class StatTrackerTest < Minitest::Test
     stat_tracker.collect_season_stats(20162017)
 
     assert_equal 0, team.preseason_games
+  end
 
   def test_it_can_determine_best_season
     stat_tracker = StatTracker.from_csv(@locations)
