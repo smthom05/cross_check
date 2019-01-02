@@ -34,9 +34,9 @@ class GameTeams
 
   def won?
     if @won == "TRUE"
-      return true
+      true
     elsif @won == "FALSE"
-      return false
+      false
     end
   end
 end

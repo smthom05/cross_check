@@ -97,36 +97,10 @@ class StatTrackerTest < Minitest::Test
     assert_equal hash, stat_tracker.average_goals_by_season
   end
 
-  def test_it_knows_wins_and_losses
+  def test_it_can_count_teams
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal false, stat_tracker.game_teams[0].won?
-    assert_equal true, stat_tracker.game_teams[1].won?
-  end
-
-  def test_it_knows_highest_scoring_home_team
-
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal "Predators", stat_tracker.highest_scoring_home_team
-  end
-
-  def test_it_knows_lowest_scoring_home_team
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal "Rangers", stat_tracker.lowest_scoring_home_team
-  end
-
-  def test_it_knows_highest_scoring_away_team
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal "Rangers", stat_tracker.highest_scoring_visitor
-  end
-
-  def test_it_knows_lowest_scoring_away_team
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal "Predators", stat_tracker.lowest_scoring_visitor
+    assert_equal 4, stat_tracker.count_of_teams
   end
 
   def test_it_can_determine_best_offense
@@ -149,10 +123,29 @@ class StatTrackerTest < Minitest::Test
     assert_equal "Blues", stat_tracker.worst_defense
   end
 
-  def test_it_can_count_teams
+  def test_it_knows_highest_scoring_away_team
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 4, stat_tracker.count_of_teams
+    assert_equal "Rangers", stat_tracker.highest_scoring_visitor
+  end
+
+  def test_it_knows_highest_scoring_home_team
+
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "Predators", stat_tracker.highest_scoring_home_team
+  end
+
+  def test_it_knows_lowest_scoring_away_team
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "Predators", stat_tracker.lowest_scoring_visitor
+  end
+
+  def test_it_knows_lowest_scoring_home_team
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "Rangers", stat_tracker.lowest_scoring_home_team
   end
 
   def test_it_can_determine_winningest_team
@@ -171,7 +164,13 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
 
     assert_equal [], stat_tracker.worst_fans
+  end
 
+  def test_it_knows_wins_and_losses
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal false, stat_tracker.game_teams[0].won?
+    assert_equal true, stat_tracker.game_teams[1].won?
   end
 
   def test_it_can_determine_biggest_bust
@@ -296,6 +295,24 @@ class StatTrackerTest < Minitest::Test
 
     assert_equal expected, stat_tracker.head_to_head(3, 6)
   end
+
+  def test_it_can_collect_league_stats
+    stat_tracker = StatTracker.from_csv(@locations)
+    stat_tracker.collect_league_stats
+    team = stat_tracker.teams[0]
+
+    assert_equal 4, team.away_games
+  end
+
+  def test_it_can_collect_season_stats
+    stat_tracker = StatTracker.from_csv(@locations)
+    stat_tracker.collect_season_stats(20122013)
+    team = stat_tracker.teams[0]
+
+    assert_equal 2, team.preseason_games
+    stat_tracker.collect_season_stats(20162017)
+
+    assert_equal 0, team.preseason_games
 
   def test_it_can_determine_best_season
     stat_tracker = StatTracker.from_csv(@locations)

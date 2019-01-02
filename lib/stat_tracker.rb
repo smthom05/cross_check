@@ -57,15 +57,15 @@ class StatTracker
 
   # returns percentage of games a home team has won
   def percentage_home_wins
-    home_wins = @teams.map {|team| team.home_wins}.sum
-    home_games = @teams.map {|team| team.home_games}.sum
+    home_wins = @teams.map { |team| team.home_wins }.sum
+    home_games = @teams.map { |team| team.home_games }.sum
     (home_wins.to_f / home_games.to_f * 100.00).round(2)
   end
 
   # returns percentage of games an away team has won
   def percentage_visitor_wins
-    visitor_wins = @teams.map {|team| team.away_wins}.sum
-    visitor_games = @teams.map {|team| team.away_games}.sum
+    visitor_wins = @teams.map { |team| team.away_wins }.sum
+    visitor_games = @teams.map { |team| team.away_games }.sum
     (visitor_wins.to_f / visitor_games.to_f * 100.0).round(2)
   end
 
@@ -103,160 +103,116 @@ class StatTracker
     end
   end
 
-  def highest_scoring_home_team
-    average_home_scores = @teams.map do |team|
-      if team.home_games.zero?
-        0
-      else
-        team.home_goals_scored.to_f / team.home_games.to_f
-      end
-    end
-    index = average_home_scores.each_with_index.max[1]
-    @teams[index].team_name
-  end
-
-  def lowest_scoring_home_team
-    average_home_scores = @teams.map do |team|
-      if team.home_games.zero?
-        10
-      else
-        team.home_goals_scored.to_f / team.home_games.to_f
-      end
-    end
-    index = average_home_scores.each_with_index.min[1]
-    @teams[index].team_name
-  end
-
-  def highest_scoring_visitor
-    average_away_scores = @teams.map do |team|
-      if team.away_games.zero?
-        0
-      else
-        team.away_goals_scored.to_f / team.away_games.to_f
-      end
-    end
-    index = average_away_scores.each_with_index.max[1]
-    @teams[index].team_name
-  end
-
-  def lowest_scoring_visitor
-    average_away_scores = @teams.map do |team|
-      if team.away_games.zero?
-        10
-      else
-        team.away_goals_scored.to_f / team.away_games.to_f
-      end
-    end
-    index = average_away_scores.each_with_index.min[1]
-    @teams[index].team_name
-  end
-
-  def best_offense
-    goals_scored = @teams.map {|team| team.total_goals_scored}
-    games_played = @teams.map {|team| team.total_games}
-    goals_and_games = goals_scored.zip(games_played)
-    average_goals = goals_and_games.map do |pair|
-      if pair[1].zero?
-        0
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
-    index = average_goals.each_with_index.max[1]
-    @teams[index].team_name
-  end
-  #
-  def worst_offense
-    goals_scored = @teams.map {|team| team.total_goals_scored}
-    games_played = @teams.map {|team| team.total_games}
-    goals_and_games = goals_scored.zip(games_played)
-    average_goals = goals_and_games.map do |pair|
-      if pair[1].zero?
-        10
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
-    index = average_goals.each_with_index.min[1]
-    @teams[index].team_name
-  end
-
-  def best_defense
-    goals_allowed = @teams.map {|team| team.total_goals_allowed}
-    games_played = @teams.map {|team| team.total_games}
-    goals_allowed_and_games = goals_allowed.zip(games_played)
-    average_goals_allowed = goals_allowed_and_games.map do |pair|
-      if pair[1].zero?
-        10
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
-    index = average_goals_allowed.each_with_index.min[1]
-    @teams[index].team_name
-  end
-
-  def worst_defense
-    goals_allowed = @teams.map {|team| team.total_goals_allowed}
-    games_played = @teams.map {|team| team.total_games}
-    goals_allowed_and_games = goals_allowed.zip(games_played)
-    average_goals_allowed = goals_allowed_and_games.map do |pair|
-      if pair[1].zero?
-        0
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
-    index = average_goals_allowed.each_with_index.max[1]
-    @teams[index].team_name
-  end
-
+  # returns total number of teams
   def count_of_teams
     @teams.count
   end
 
-  def winningest_team
-    number_of_wins = @teams.map {|team| team.total_wins}
+  # returns team with highest average number of goals
+  def best_offense
+    goals_scored = @teams.map { |team| team.total_goals_scored }
+    games_played = @teams.map { |team| team.total_games }
+    goals_and_games = goals_scored.zip(games_played)
+    average_goals = goals_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    average_goals.delete_if { |goals| goals.nan? }
+    index = average_goals.each_with_index.max[1]
+    @teams[index].team_name
+  end
+
+  # returns team with lowest average number of goals
+  def worst_offense
+    goals_scored = @teams.map {|team| team.total_goals_scored}
     games_played = @teams.map {|team| team.total_games}
+    goals_and_games = goals_scored.zip(games_played)
+    average_goals = goals_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    average_goals.delete_if {|goals| goals.nan?}
+    index = average_goals.each_with_index.min[1]
+    @teams[index].team_name
+  end
+
+  # returns team with lowest average goals allowed
+  def best_defense
+    goals_allowed = @teams.map {| team| team.total_goals_allowed }
+    games_played = @teams.map { |team| team.total_games }
+    goals_allowed_and_games = goals_allowed.zip(games_played)
+    average_goals_allowed = goals_allowed_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    average_goals_allowed.delete_if { |goals| goals.nan? }
+    index = average_goals_allowed.each_with_index.min[1]
+    @teams[index].team_name
+  end
+
+  # returns team with highest average goals allowed
+  def worst_defense
+    goals_allowed = @teams.map { |team| team.total_goals_allowed }
+    games_played = @teams.map { |team| team.total_games }
+    goals_allowed_and_games = goals_allowed.zip(games_played)
+    average_goals_allowed = goals_allowed_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    average_goals_allowed.delete_if { |goals| goals.nan? }
+    index = average_goals_allowed.each_with_index.max[1]
+    @teams[index].team_name
+  end
+
+  # returns team with highest average away goals
+  def highest_scoring_visitor
+    average_away_scores = @teams.map { |team| team.away_goals_scored.to_f / team.away_games.to_f }
+    average_away_scores.delete_if { |score| score.nan? }
+    index = average_away_scores.each_with_index.max[1]
+    @teams[index].team_name
+  end
+
+  # returns team with highest average home goals
+  def highest_scoring_home_team
+    average_home_scores = @teams.map { |team| team.home_goals_scored.to_f / team.home_games.to_f }
+    average_home_scores.delete_if { |score| score.nan? }
+    index = average_home_scores.each_with_index.max[1]
+    @teams[index].team_name
+  end
+
+  # returns team with lowest average away goals
+  def lowest_scoring_visitor
+    average_away_scores = @teams.map { |team| team.away_goals_scored.to_f / team.away_games.to_f }
+    average_away_scores.delete_if { |score| score.nan? }
+    index = average_away_scores.each_with_index.min[1]
+    @teams[index].team_name
+  end
+
+  # returns team with lowest average home goals
+  def lowest_scoring_home_team
+    average_home_scores = @teams.map { |team| team.home_goals_scored.to_f / team.home_games.to_f }
+    average_home_scores.delete_if { |score| score.nan? }
+    index = average_home_scores.each_with_index.min[1]
+    @teams[index].team_name
+  end
+
+  # returns team with highest win percentage
+  def winningest_team
+    number_of_wins = @teams.map { |team| team.total_wins }
+    games_played = @teams.map { |team| team.total_games }
     wins_and_games = number_of_wins.zip(games_played)
-    win_percentage = wins_and_games.map do |pair|
-      if pair[1].zero?
-        0
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
+    win_percentage = wins_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    win_percentage.delete_if { |percentage| percentage.nan? }
     index = win_percentage.each_with_index.max[1]
     @teams[index].team_name
   end
 
+  # returns team with biggest difference between home and away win percentages
   def best_fans
-    home_wins = @teams.map {|team| team.home_wins}
-    home_games = @teams.map {|team| team.home_games}
-    away_wins = @teams.map {|team| team.away_wins}
-    away_games = @teams.map {|team| team.away_games}
+    home_wins = @teams.map { |team| team.home_wins }
+    home_games = @teams.map { |team| team.home_games }
+    away_wins = @teams.map { |team| team.away_wins }
+    away_games = @teams.map { |team| team.away_games }
     home_wins_and_games = home_wins.zip(home_games)
     away_wins_and_games = away_wins.zip(away_games)
-    home_win_percentage = home_wins_and_games.map do |pair|
-      if pair[1].zero?
-        0
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
-    away_win_percentage = away_wins_and_games.map do |pair|
-      if pair[1].zero?
-        0
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
+    home_win_percentage = home_wins_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    away_win_percentage = away_wins_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
     home_and_away_win_percentage = home_win_percentage.zip(away_win_percentage)
     win_percentage_difference = home_and_away_win_percentage.map {|pair| pair[0].to_f - pair[1].to_f}
+    win_percentage_difference.delete_if { |percentage| percentage.nan? }
     index = win_percentage_difference.each_with_index.max[1]
     @teams[index].team_name
   end
 
+  # returns aray with all teams with better away than home records
   def worst_fans
     home_wins = @teams.map {|team| team.home_wins}
     home_games = @teams.map {|team| team.home_games}
@@ -285,24 +241,13 @@ class StatTracker
     regular_wins = teams.map {|team|team.regular_wins}
     preseason_wins_and_games = preseason_wins.zip(preseason_games)
     regular_wins_and_games = regular_wins.zip(regular_games)
-    preseason_win_percentage = preseason_wins_and_games.map do |pair|
-      if pair[1] == 0
-        0
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
-    regular_win_percentage = regular_wins_and_games.map do |pair|
-      if pair[1] == 0
-        0
-      else
-        pair[0].to_f / pair[1].to_f
-      end
-    end
+    preseason_win_percentage = preseason_wins_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    regular_win_percentage = regular_wins_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
     preseason_and_regular_win_percentage = preseason_win_percentage.zip(regular_win_percentage)
-    biggest_bust = preseason_and_regular_win_percentage.map {|pair| pair[0] - pair[1]}
-    biggest_bust_index = biggest_bust.each_with_index.max[1]
-    @teams[biggest_bust_index].team_name
+    biggest_bust = preseason_and_regular_win_percentage.map { |pair| pair[0] - pair[1] }
+    biggest_bust.delete_if { |percentage| percentage.nan? }
+    index = biggest_bust.each_with_index.max[1]
+    @teams[index].team_name
   end
 
 
@@ -311,10 +256,10 @@ class StatTracker
     games_won = 0
 
     game_teams.each do |game|
-      if game.team_id == team_id && game.won? == true
+      if game.team_id == team_id && game.won?
         games_played += 1.0
         games_won += 1.0
-      elsif game.team_id == team_id && game.won? == false
+      elsif game.team_id == team_id && !game.won?
         games_played += 1.0
       end
     end
