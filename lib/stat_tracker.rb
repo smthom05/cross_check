@@ -59,31 +59,31 @@ class StatTracker
   def percentage_home_wins
     home_wins = @teams.map { |team| team.home_wins }.sum
     home_games = @teams.map { |team| team.home_games }.sum
-    (home_wins.to_f / home_games.to_f * 100.00).round(2)
+    (home_wins.to_f / home_games.to_f).round(2)
   end
 
   # returns percentage of games an away team has won
   def percentage_visitor_wins
     visitor_wins = @teams.map { |team| team.away_wins }.sum
     visitor_games = @teams.map { |team| team.away_games }.sum
-    (visitor_wins.to_f / visitor_games.to_f * 100.0).round(2)
+    (visitor_wins.to_f / visitor_games.to_f).round(2)
   end
 
   # returns season with most games played
   def season_with_most_games
     seasons = @games.map { |game| game.season }
-    seasons.max_by { |season| seasons.count(season) }
+    seasons.max_by { |season| seasons.count(season) }.to_s
   end
 
   # returns season with fewest games played
   def season_with_fewest_games
     seasons = @games.map { |game| game.season }
-    seasons.min_by { |season| seasons.count(season) }
+    seasons.min_by { |season| seasons.count(season) }.to_s
   end
 
   # returns a hash with season names as keys and counts of games as values
   def count_of_games_by_season
-    games_by_season = @games.group_by { |game| game.season }
+    games_by_season = @games.group_by { |game| game.season.to_s }
     games_by_season.each { |season, games| games_by_season[season] = games.count }
   end
 
@@ -96,10 +96,10 @@ class StatTracker
 
   # returns a hash with season names as keys and average goals that season as a value
   def average_goals_by_season
-    goals_by_season = @games.group_by { |game| game.season }
+    goals_by_season = @games.group_by { |game| game.season.to_s }
     goals_by_season.each do |season, games|
       season_goals = games.map { |game| game.home_goals + game.away_goals }.sum
-      goals_by_season[season] = season_goals.to_f / games.count.to_f
+      goals_by_season[season] = (season_goals.to_f / games.count.to_f).round(2)
     end
   end
 
@@ -310,16 +310,17 @@ class StatTracker
   end
 
   def season_summary(season, team_id)
-    collect_season_stats(season)
+    collect_season_stats(season.to_f)
     team = ""
     @teams.each do |each_team|
-      if each_team.team_id == team_id
+      if each_team.team_id.to_s == team_id
         team = each_team
       end
     end
 
-    preseason_win_percentage = team.preseason_wins.to_f / team.preseason_games.to_f * 100.0
-    regular_win_percentage = team.regular_wins.to_f / team.regular_games.to_f * 100.0
+    # require 'pry'; binding.pry
+    preseason_win_percentage = (team.preseason_wins.to_f / team.preseason_games.to_f).round(2)
+    regular_win_percentage = (team.regular_wins.to_f / team.regular_games.to_f).round(2)
 
     preseason_hash = {
       win_percentage: preseason_win_percentage,
@@ -346,7 +347,7 @@ class StatTracker
     goals_per_game.compact.max
   end
 
-  def least_goals_scored(team_id)
+  def fewest_goals_scored(team_id)
     goals_per_game = @game_teams.map do |game|
       if game.team_id == team_id
         game.goals
@@ -425,9 +426,9 @@ class StatTracker
 
   def biggest_team_blowout(team_id)
     @games.map do |game|
-      if game.away_team_id == team_id
+      if game.away_team_id.to_s == team_id
         game.away_goals - game.home_goals
-      elsif game.home_team_id == team_id
+      elsif game.home_team_id.to_s == team_id
         game.home_goals - game.away_goals
       end
     end.compact.max
@@ -435,9 +436,9 @@ class StatTracker
 
   def worst_loss(team_id)
     @games.map do |game|
-      if game.away_team_id == team_id
+      if game.away_team_id.to_s == team_id
         game.home_goals - game.away_goals
-      elsif game.home_team_id == team_id
+      elsif game.home_team_id.to_s == team_id
         game.away_goals - game.home_goals
       end
     end.compact.max
