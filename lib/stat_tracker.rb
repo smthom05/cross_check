@@ -497,4 +497,27 @@ class StatTracker
     end
     hash
   end
+
+  def best_season(team_id)
+    team_seasonal_summary = seasonal_summary(team_id)
+      best_season = seasonal_summary(team_id).keys.first
+      team_seasonal_summary.each do |season, stats|
+        if stats[:regular_season][:win_percentage] > team_seasonal_summary[best_season][:regular_season][:win_percentage]
+          best_season = season
+        end
+      end
+      best_season
+  end
+
+  def worst_season(team_id)
+    team_seasonal_summary = seasonal_summary(team_id)
+    worst_season = seasonal_summary(team_id).keys.first
+    team_seasonal_summary.each do |season, stats|
+      if stats[:regular_season][:win_percentage] < team_seasonal_summary[worst_season][:regular_season][:win_percentage]
+        worst_season = season
+      end
+    end
+      worst_season
+  end
+
 end
