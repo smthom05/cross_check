@@ -197,15 +197,15 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
 
     expected = {
-      team_id: 19,
-      franchise_id: 18,
-      short_name: "St Louis",
-      team_name: "Blues",
-      abbreviation: "STL",
-      link: "/api/v1/teams/19"
+      "team_id" => "19",
+      "franchise_id" => "18",
+      "short_name" => "St Louis",
+      "team_name" => "Blues",
+      "abbreviation" => "STL",
+      "link" => "/api/v1/teams/19"
     }
 
-    assert_equal expected, stat_tracker.team_info(19)
+    assert_equal expected, stat_tracker.team_info("19")
   end
 
 

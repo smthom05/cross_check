@@ -297,7 +297,7 @@ class StatTracker
   def team_info(team_id)
     team_info_hash = {}
     @teams.each do |team|
-      if team_id == team.team_id.to_s
+      if team_id.to_i == team.team_id
         team_info_hash["team_id"] = team.team_id.to_s
         team_info_hash["franchise_id"] = team.franchise_id.to_s
         team_info_hash["short_name"] = team.short_name
