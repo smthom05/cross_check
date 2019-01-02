@@ -197,15 +197,15 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
 
     expected = {
-      team_id: 19,
-      franchise_id: 18,
-      short_name: "St Louis",
-      team_name: "Blues",
-      abbreviation: "STL",
-      link: "/api/v1/teams/19"
+      "team_id" => "19",
+      "franchise_id" => "18",
+      "short_name" => "St Louis",
+      "team_name" => "Blues",
+      "abbreviation" => "STL",
+      "link" => "/api/v1/teams/19"
     }
 
-    assert_equal expected, stat_tracker.team_info(19)
+    assert_equal expected, stat_tracker.team_info("19")
   end
 
 
@@ -313,16 +313,17 @@ class StatTrackerTest < Minitest::Test
     stat_tracker.collect_season_stats(20162017)
 
     assert_equal 0, team.preseason_games
+  end
 
   def test_it_can_determine_best_season
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 20162017, stat_tracker.best_season(19)
+    assert_equal "20162017", stat_tracker.best_season(19)
   end
 
   def test_it_can_determine_worst_season
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 20122013, stat_tracker.worst_season(6)
+    assert_equal "20122013", stat_tracker.worst_season(6)
   end
 end
