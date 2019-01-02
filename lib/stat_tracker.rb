@@ -1,8 +1,8 @@
 require 'csv'
-require './lib/game'
-require './lib/game_teams'
-require './lib/team'
-require './lib/modules/league_stats'
+require_relative './game'
+require_relative './game_teams'
+require_relative './team'
+require_relative './modules/league_stats'
 
 class StatTracker
 
@@ -297,13 +297,13 @@ class StatTracker
   def team_info(team_id)
     team_info_hash = {}
     @teams.each do |team|
-      if team_id == team.team_id
-        team_info_hash[:team_id] = team.team_id
-        team_info_hash[:franchise_id] = team.franchise_id
-        team_info_hash[:short_name] = team.short_name
-        team_info_hash[:team_name] = team.team_name
-        team_info_hash[:abbreviation] = team.abbreviation
-        team_info_hash[:link] = team.link
+      if team_id == team.team_id.to_s
+        team_info_hash["team_id"] = team.team_id.to_s
+        team_info_hash["franchise_id"] = team.franchise_id.to_s
+        team_info_hash["short_name"] = team.short_name
+        team_info_hash["team_name"] = team.team_name
+        team_info_hash["abbreviation"] = team.abbreviation
+        team_info_hash["link"] = team.link
       end
     end
     team_info_hash
@@ -499,6 +499,7 @@ class StatTracker
   end
 
   def best_season(team_id)
+    team_id = team_id.to_i
     team_seasonal_summary = seasonal_summary(team_id)
       best_season = seasonal_summary(team_id).keys.first
       team_seasonal_summary.each do |season, stats|
@@ -506,10 +507,11 @@ class StatTracker
           best_season = season
         end
       end
-      best_season
+      best_season.to_s
   end
 
   def worst_season(team_id)
+    team_id = team_id.to_i
     team_seasonal_summary = seasonal_summary(team_id)
     worst_season = seasonal_summary(team_id).keys.first
     team_seasonal_summary.each do |season, stats|
@@ -517,7 +519,7 @@ class StatTracker
         worst_season = season
       end
     end
-      worst_season
+      worst_season.to_s
   end
 
 end
