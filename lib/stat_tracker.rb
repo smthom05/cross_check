@@ -272,36 +272,13 @@ class StatTracker
     end.compact.max
   end
 
-  # returns record (as a hash - win/loss) against each opponent
-  def head_to_head(team_id_1, team_id_2)
-    hash = {
-      wins: 0,
-      losses: 0
-    }
-    @games.each do |game|
-      if team_id_1 == game.home_team_id && team_id_2 == game.away_team_id
-        if game.home_goals > game.away_goals
-          hash[:wins] += 1
-        elsif game.away_goals > game.home_goals
-          hash[:losses] += 1
-        end
-      elsif team_id_2 == game.home_team_id && team_id_1 == game.away_team_id
-        if game.away_goals > game.home_goals
-          hash[:losses] += 1
-        elsif game.home_goals > game.away_goals
-          hash[:wins] += 1
-        end
-      end
-    end
-    hash
-  end
-
   # For each season a team has played, returns a hash that has two keys (:preseason, and :regular_season), that each point to a hash with the following keys: :win_percentage, :total_goals_scored, :total_goals_against, :average_goals_scored, :average_goals_against
   def seasonal_summary(team_id)
     team_id = team_id.to_i
     seasonal_summary_hash(@teams, team_id)
   end
-  
+
+  # returns record (as a hash - win/loss) against each opponent
   def head_to_head(team_id)
     team_id = team_id.to_i
     head_to_head_hash = {}
@@ -316,29 +293,4 @@ class StatTracker
     end
     head_to_head_hash
   end
-
-  def best_season(team_id)
-    team_id = team_id.to_i
-    team_seasonal_summary = seasonal_summary(team_id)
-      best_season = seasonal_summary(team_id).keys.first
-      team_seasonal_summary.each do |season, stats|
-        if stats[:regular_season][:win_percentage] > team_seasonal_summary[best_season][:regular_season][:win_percentage]
-          best_season = season
-        end
-      end
-    best_season.to_s
-  end
-
-  def worst_season(team_id)
-    team_id = team_id.to_i
-    team_seasonal_summary = seasonal_summary(team_id)
-    worst_season = seasonal_summary(team_id).keys.first
-    team_seasonal_summary.each do |season, stats|
-      if stats[:regular_season][:win_percentage] < team_seasonal_summary[worst_season][:regular_season][:win_percentage]
-        worst_season = season
-      end
-    end
-    worst_season.to_s
-  end
-
 end
