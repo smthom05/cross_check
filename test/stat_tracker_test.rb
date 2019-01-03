@@ -17,6 +17,7 @@ class StatTrackerTest < Minitest::Test
 
   def test_it_exists
     stat_tracker = StatTracker.from_csv(@locations)
+
     assert_instance_of StatTracker, stat_tracker
   end
 
@@ -65,15 +66,13 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_season_with_most_games
     stat_tracker = StatTracker.from_csv(@locations)
 
-    #full csv gives back 20172018
-    assert_equal "20122013", stat_tracker.season_with_most_games
+    assert_equal 20122013, stat_tracker.season_with_most_games
   end
 
   def test_it_can_determine_season_with_fewest_games
     stat_tracker = StatTracker.from_csv(@locations)
 
-    #full csv gives back 20122013
-    assert_equal "20122013", stat_tracker.season_with_fewest_games
+    assert_equal 20122013, stat_tracker.season_with_fewest_games
   end
 
   def test_it_can_determine_games_by_season
@@ -150,19 +149,25 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_winningest_team
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal "Blues", stat_tracker.winningest_team
+    assert_equal "Rangers", stat_tracker.winningest_team
   end
 
   def test_it_can_determine_best_fans
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal "Blues", stat_tracker.best_fans
+    assert_equal "Predators", stat_tracker.best_fans
   end
 
   def test_it_can_determine_worst_fans
     stat_tracker = StatTracker.from_csv(@locations)
 
     assert_equal [], stat_tracker.worst_fans
+  end
+
+  def test_it_can_determine_biggest_bust
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal "Bruins", stat_tracker.biggest_bust("20122013")
   end
 
   def test_it_knows_wins_and_losses
@@ -172,23 +177,18 @@ class StatTrackerTest < Minitest::Test
     assert_equal true, stat_tracker.game_teams[1].won?
   end
 
-  def test_it_can_determine_biggest_bust
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    assert_equal "Bruins", stat_tracker.biggest_bust(20122013)
-  end
 
 
   def test_it_can_give_average_win_percentage
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 0.50, stat_tracker.average_win_percentage(6)
+    assert_equal 0.50, stat_tracker.average_win_percentage("6")
   end
 
   def test_it_can_determine_biggest_surprise
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal "Rangers", stat_tracker.biggest_surprise(20122013)
+    assert_equal "Rangers", stat_tracker.biggest_surprise("20122013")
   end
 
 
@@ -228,25 +228,25 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_determine_most_goals_scored
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 6, stat_tracker.most_goals_scored(18)
+    assert_equal 6, stat_tracker.most_goals_scored("18")
   end
 
   def test_it_can_determine_fewest_goals_scored
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal 1, stat_tracker.fewest_goals_scored(18)
+    assert_equal 1, stat_tracker.fewest_goals_scored("18")
   end
 
   def test_it_can_determine_favorite_opponent
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal "Bruins", stat_tracker.favorite_opponent(3)
+    assert_equal "Bruins", stat_tracker.favorite_opponent("3")
   end
 
   def test_it_can_determine_rival
     stat_tracker = StatTracker.from_csv(@locations)
 
-    assert_equal "Bruins", stat_tracker.rival(3)
+    assert_equal "Bruins", stat_tracker.rival("3")
   end
 
   def test_it_can_determine_biggest_team_blowout
@@ -264,7 +264,7 @@ class StatTrackerTest < Minitest::Test
   def test_it_can_give_a_seasonal_summary
     stat_tracker = StatTracker.from_csv(@locations)
     hash = {
-      20122013 => {
+      "20122013" => {
         preseason: {
           win_percentage: 0.0,
           total_goals_scored: 3,
@@ -273,7 +273,7 @@ class StatTrackerTest < Minitest::Test
           average_goals_against: 2.5
         },
         regular_season: {
-          win_percentage: 100.0,
+          win_percentage: 1.0,
           total_goals_scored: 8,
           total_goals_against: 6,
           average_goals_scored: 4.0,
@@ -281,7 +281,7 @@ class StatTrackerTest < Minitest::Test
         }
       }
     }
-    assert_equal hash, stat_tracker.seasonal_summary(3)
+    assert_equal hash, stat_tracker.seasonal_summary("3")
   end
 
   def test_it_can_give_head_to_head
