@@ -115,6 +115,7 @@ module LeagueStats
         team.regular_win_percentage[season] = team.regular_wins[season].to_f / team.regular_games[season].to_f
         team.regular_average_goals_scored[season] = team.regular_goals_scored[season].to_f / team.regular_games[season].to_f
         team.regular_average_goals_against[season] = team.regular_goals_against[season].to_f / team.regular_games[season].to_f
+        team.season_win_percentages[season] = (team.regular_win_percentage[season] + team.preseason_win_percentage[season]) / 2.0
       end
       team.preseason_games.keys.each do |season|
         team.preseason_win_percentage[season] = team.preseason_wins[season].to_f / team.preseason_games[season].to_f

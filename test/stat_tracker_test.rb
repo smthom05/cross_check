@@ -228,11 +228,11 @@ class StatTrackerTest < Minitest::Test
     assert_equal "20122013", stat_tracker.worst_season(6)
   end
 
-  # def test_it_can_give_average_win_percentage
-  #   stat_tracker = StatTracker.from_csv(@locations)
-  #
-  #   assert_equal 0.50, stat_tracker.average_win_percentage("6")
-  # end
+  def test_it_can_give_average_win_percentage
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    assert_equal 0.50, stat_tracker.average_win_percentage("6")
+  end
 
   def test_it_can_determine_most_goals_scored
     stat_tracker = StatTracker.from_csv(@locations)

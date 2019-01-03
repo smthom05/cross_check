@@ -224,27 +224,15 @@ class StatTracker
   # returns the season with the highest win percentage for a team
   def best_season(team_id)
     team_id = team_id.to_i
-    team_seasonal_summary = seasonal_summary(team_id)
-    best_season = seasonal_summary(team_id).keys.first
-    team_seasonal_summary.each do |season, stats|
-      if stats[:regular_season][:win_percentage] > team_seasonal_summary[best_season][:regular_season][:win_percentage]
-        best_season = season
-      end
-    end
-    best_season.to_s
+    team = @teams.select { |each_team| each_team.team_id == team_id }.first
+    team.season_win_percentages.max_by { |season, percentage| percentage }.first.to_s
   end
 
   # returns the season with the lowest win percentage for a team
   def worst_season(team_id)
     team_id = team_id.to_i
-    team_seasonal_summary = seasonal_summary(team_id)
-    worst_season = seasonal_summary(team_id).keys.first
-    team_seasonal_summary.each do |season, stats|
-      if stats[:regular_season][:win_percentage] < team_seasonal_summary[worst_season][:regular_season][:win_percentage]
-        worst_season = season
-      end
-    end
-    worst_season.to_s
+    team = @teams.select { |each_team| each_team.team_id == team_id }.first
+    team.season_win_percentages.min_by { |season, percentage| percentage }.first.to_s
   end
 
   # returns average win percentage of all games for a team
