@@ -303,7 +303,6 @@ class StatTrackerTest < Minitest::Test
     assert_equal hash, stat_tracker.seasonal_summary("3")
   end
 
-
   def test_it_can_give_head_to_head
     stat_tracker = StatTracker.from_csv(@locations)
 
@@ -313,7 +312,6 @@ class StatTrackerTest < Minitest::Test
 
     assert_equal expected, stat_tracker.head_to_head("3")
   end
-
 
   def test_it_can_collect_league_stats
     stat_tracker = StatTracker.from_csv(@locations)
@@ -331,6 +329,4 @@ class StatTrackerTest < Minitest::Test
     assert_equal 4, team.preseason_games[20122013]
     assert_equal 0, team.preseason_games[20132014]
   end
-
-
 end
