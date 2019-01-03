@@ -17,7 +17,7 @@ class StatTrackerTest < Minitest::Test
 
   def test_it_exists
     stat_tracker = StatTracker.from_csv(@locations)
-    require 'pry'; binding.pry
+
     assert_instance_of StatTracker, stat_tracker
   end
 
