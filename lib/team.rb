@@ -40,7 +40,8 @@ class Team
                 :home_minus_away_percentage,
                 :average_home_goals,
                 :average_away_goals,
-                :total_win_percentage
+                :total_win_percentage,
+                :season_win_percentages
   def initialize(attribute_array)
     @team_id = attribute_array[0].to_i
     @franchise_id = attribute_array[1].to_i
@@ -84,5 +85,6 @@ class Team
     @matchup_wins = Hash.new(0)
     @matchup_win_percentage = Hash.new(0)
     @preseason_to_regular_increase = Hash.new(0)
+    @season_win_percentages = Hash.new(0)
   end
 end
