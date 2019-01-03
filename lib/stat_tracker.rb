@@ -48,14 +48,14 @@ class StatTracker
 
   # returns venue with most games played
   def most_popular_venue
-    venues = @games.map { |game| game.venue }
-    venues.max_by { |venue| venues.count(venue) }
+    venues = @games.group_by { |game| game.venue}
+    venues.max_by { |venue, games| games.count }.first
   end
 
   # returns venue with least games played
   def least_popular_venue
-    venues = @games.map { |game| game.venue }
-    venues.min_by { |venue| venues.count(venue) }
+    venues = @games.group_by { |game| game.venue}
+    venues.min_by { |venue, games| games.count }.first
   end
 
   # returns percentage of games a home team has won
@@ -74,14 +74,14 @@ class StatTracker
 
   # returns season with most games played
   def season_with_most_games
-    seasons = @games.map { |game| game.season }
-    seasons.max_by { |season| seasons.count(season) }
+    seasons = @games.group_by { |game| game.season }
+    seasons.max_by { |season, games| games.count }.first
   end
 
   # returns season with fewest games played
   def season_with_fewest_games
-    seasons = @games.map { |game| game.season }
-    seasons.min_by { |season| seasons.count(season) }
+    seasons = @games.group_by { |game| game.season }
+    seasons.min_by { |season, games| games.count }.first
   end
 
   # returns a hash with season names as keys and counts of games as values
