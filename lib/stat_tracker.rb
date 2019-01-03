@@ -205,14 +205,7 @@ class StatTracker
     }
   end
 
-  def average_win_percentage(team_id)
-    team_id = team_id.to_i
-    team = @teams.select { |each_team| each_team.team_id == team_id }.first
-    games_played = team.away_games + team.home_games
-    games_won = team.home_wins + team.away_wins
-    (games_won.to_f / games_played.to_f).round(2)
-  end
-
+  # returns a hash with key/value pairs for each of the attributes of a team
   def team_info(team_id)
     team_info_hash = {}
     @teams.each do |team|
@@ -228,6 +221,28 @@ class StatTracker
     team_info_hash
   end
 
+  # returns the season with the highest win percentage for a team
+  def best_season(team_id)
+    team_id = team_id.to_i
+    team = @teams.select { |each_team| each_team.team_id == team_id }.first
+    team.season_win_percentages.max_by { |season, percentage| percentage }.first.to_s
+  end
+
+  # returns the season with the lowest win percentage for a team
+  def worst_season(team_id)
+    team_id = team_id.to_i
+    team = @teams.select { |each_team| each_team.team_id == team_id }.first
+    team.season_win_percentages.min_by { |season, percentage| percentage }.first.to_s
+  end
+
+  # returns average win percentage of all games for a team
+  def average_win_percentage(team_id)
+    team_id = team_id.to_i
+    team = @teams.select { |each_team| each_team.team_id == team_id }.first
+    team.total_win_percentage.round(2)
+  end
+
+  # returns the highest number of goals a particular team has scored in a game
   def most_goals_scored(team_id)
     team_id = team_id.to_i
     goals_per_game = @game_teams.map do |game|
@@ -238,6 +253,7 @@ class StatTracker
     goals_per_game.compact.max
   end
 
+  # returns the lowest number of goals a particular team has scored in a game
   def fewest_goals_scored(team_id)
     team_id = team_id.to_i
     goals_per_game = @game_teams.map do |game|
@@ -248,6 +264,7 @@ class StatTracker
     goals_per_game.compact.min
   end
 
+  # returns the name of the opponent that has the lowest win percentage against the given team
   def favorite_opponent(team_id)
     team_id = team_id.to_i
     team = @teams.select { |each_team| each_team.team_id == team_id }.first
@@ -255,6 +272,7 @@ class StatTracker
     @teams.select { |each_team| each_team.team_id == favorite_opponent_id }.first.team_name
   end
 
+  # returns the name of the opponent that has the highest win percentage against the given team
   def rival(team_id)
     team_id = team_id.to_i
     team = @teams.select { |each_team| each_team.team_id == team_id }.first
@@ -262,6 +280,7 @@ class StatTracker
     @teams.select { |each_team| each_team.team_id == rival_id }.first.team_name
   end
 
+  # returns the biggest difference between team goals and opponent goals for a win for the given team
   def biggest_team_blowout(team_id)
     @games.map do |game|
       if game.away_team_id.to_s == team_id
@@ -272,6 +291,7 @@ class StatTracker
     end.compact.max
   end
 
+  # returns the biggest difference between team goals and opponent goals for a loss for the given team
   def worst_loss(team_id)
     @games.map do |game|
       if game.away_team_id.to_s == team_id
@@ -282,6 +302,31 @@ class StatTracker
     end.compact.max
   end
 
+  # returns record (as a hash - win/loss) against each opponent
+  def head_to_head(team_id_1, team_id_2)
+    hash = {
+      wins: 0,
+      losses: 0
+    }
+    @games.each do |game|
+      if team_id_1 == game.home_team_id && team_id_2 == game.away_team_id
+        if game.home_goals > game.away_goals
+          hash[:wins] += 1
+        elsif game.away_goals > game.home_goals
+          hash[:losses] += 1
+        end
+      elsif team_id_2 == game.home_team_id && team_id_1 == game.away_team_id
+        if game.away_goals > game.home_goals
+          hash[:losses] += 1
+        elsif game.home_goals > game.away_goals
+          hash[:wins] += 1
+        end
+      end
+    end
+    hash
+  end
+
+  # For each season a team has played, returns a hash that has two keys (:preseason, and :regular_season), that each point to a hash with the following keys: :win_percentage, :total_goals_scored, :total_goals_against, :average_goals_scored, :average_goals_against
   def seasonal_summary(team_id)
     team_id = team_id.to_i
     team = @teams.select { |each_team|  each_team.team_id == team_id }.first
@@ -312,50 +357,4 @@ class StatTracker
     seasonal_summary
   end
 
-  def head_to_head(team_id_1, team_id_2)
-    hash = {
-      wins: 0,
-      losses: 0
-    }
-    @games.each do |game|
-      if team_id_1 == game.home_team_id && team_id_2 == game.away_team_id
-        if game.home_goals > game.away_goals
-          hash[:wins] += 1
-        elsif game.away_goals > game.home_goals
-          hash[:losses] += 1
-        end
-      elsif team_id_2 == game.home_team_id && team_id_1 == game.away_team_id
-        if game.away_goals > game.home_goals
-          hash[:losses] += 1
-        elsif game.home_goals > game.away_goals
-          hash[:wins] += 1
-        end
-      end
-    end
-    hash
-  end
-
-  def best_season(team_id)
-    team_id = team_id.to_i
-    team_seasonal_summary = seasonal_summary(team_id)
-      best_season = seasonal_summary(team_id).keys.first
-      team_seasonal_summary.each do |season, stats|
-        if stats[:regular_season][:win_percentage] > team_seasonal_summary[best_season][:regular_season][:win_percentage]
-          best_season = season
-        end
-      end
-    best_season.to_s
-  end
-
-  def worst_season(team_id)
-    team_id = team_id.to_i
-    team_seasonal_summary = seasonal_summary(team_id)
-    worst_season = seasonal_summary(team_id).keys.first
-    team_seasonal_summary.each do |season, stats|
-      if stats[:regular_season][:win_percentage] < team_seasonal_summary[worst_season][:regular_season][:win_percentage]
-        worst_season = season
-      end
-    end
-    worst_season.to_s
-  end
 end
