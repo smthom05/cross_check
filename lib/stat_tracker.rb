@@ -314,6 +314,17 @@ class StatTracker
 
   def head_to_head(team_id)
     team_id = team_id.to_i
+    head_to_head_hash = {}
+    team = @teams.select { |each_team| each_team.team_id == team_id }.first
+    head_to_head_id_hash = team.matchup_win_percentage
+    head_to_head_id_hash.each do |team_id, win_percentage|
+      @teams.each do |team|
+        if team.team_id == team_id
+          head_to_head_hash[team.team_name] = win_percentage
+        end
+      end
+    end
+    head_to_head_hash
   end
 
   def best_season(team_id)
