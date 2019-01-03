@@ -269,17 +269,6 @@ class StatTrackerTest < Minitest::Test
     assert_equal 2, stat_tracker.worst_loss("18")
   end
 
-  def test_it_can_give_head_to_head
-    stat_tracker = StatTracker.from_csv(@locations)
-
-    expected = {
-      wins: 2,
-      losses: 2
-    }
-
-    assert_equal expected, stat_tracker.head_to_head(3, 6)
-  end
-
   def test_it_can_give_a_seasonal_summary
     stat_tracker = StatTracker.from_csv(@locations)
     hash = {
