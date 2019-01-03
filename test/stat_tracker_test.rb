@@ -305,6 +305,17 @@ class StatTrackerTest < Minitest::Test
   end
 
 
+  def test_it_can_give_head_to_head
+    stat_tracker = StatTracker.from_csv(@locations)
+
+    expected = {
+      "Bruins" => 0.5
+    }
+
+    assert_equal expected, stat_tracker.head_to_head("3")
+  end
+
+
   def test_it_can_collect_league_stats
     stat_tracker = StatTracker.from_csv(@locations)
     stat_tracker.collect_league_stats
