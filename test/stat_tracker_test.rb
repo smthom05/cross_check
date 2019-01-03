@@ -17,7 +17,6 @@ class StatTrackerTest < Minitest::Test
 
   def test_it_exists
     stat_tracker = StatTracker.from_csv(@locations)
-
     assert_instance_of StatTracker, stat_tracker
   end
 
@@ -306,13 +305,11 @@ class StatTrackerTest < Minitest::Test
 
   def test_it_can_collect_season_stats
     stat_tracker = StatTracker.from_csv(@locations)
-    stat_tracker.collect_season_stats(20122013)
+    stat_tracker.collect_season_stats
     team = stat_tracker.teams[0]
 
-    assert_equal 2, team.preseason_games
-    stat_tracker.collect_season_stats(20162017)
-
-    assert_equal 0, team.preseason_games
+    assert_equal 4, team.preseason_games[20122013]
+    assert_equal 0, team.preseason_games[20132014]
   end
 
   def test_it_can_determine_best_season

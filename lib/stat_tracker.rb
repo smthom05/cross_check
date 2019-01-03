@@ -16,6 +16,7 @@ class StatTracker
     @teams = teams
     @game_teams = game_teams
     collect_league_stats
+    collect_season_stats
   end
 
   def self.from_csv(locations)
@@ -27,6 +28,7 @@ class StatTracker
 
   # returns highest sum of the winning and losing teams’ scores
   def highest_total_score
+    # require 'pry'; binding.pry
     total_game_scores = games.map { |game| game.home_goals + game.away_goals}
     total_game_scores.max
   end
@@ -234,15 +236,14 @@ class StatTracker
   end
 
   def biggest_bust(season)
-    collect_season_stats(season)
-    preseason_games = teams.map {|team| team.preseason_games}
-    preseason_wins = teams.map {|team| team.preseason_wins}
-    regular_games = teams.map {|team| team.regular_games}
-    regular_wins = teams.map {|team|team.regular_wins}
+    preseason_games = teams.map {|team| team.preseason_games[season]}
+    preseason_wins = teams.map {|team| team.preseason_wins[season]}
+    regular_games = teams.map {|team| team.regular_games[season]}
+    regular_wins = teams.map {|team|team.regular_wins[season]}
     preseason_wins_and_games = preseason_wins.zip(preseason_games)
     regular_wins_and_games = regular_wins.zip(regular_games)
-    preseason_win_percentage = preseason_wins_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
-    regular_win_percentage = regular_wins_and_games.map { |pair| pair[0].to_f / pair[1].to_f }
+    preseason_win_percentage = preseason_wins_and_games.map { |pair| pair[0] / pair[1] }
+    regular_win_percentage = regular_wins_and_games.map { |pair| pair[0] / pair[1] }
     preseason_and_regular_win_percentage = preseason_win_percentage.zip(regular_win_percentage)
     biggest_bust = preseason_and_regular_win_percentage.map { |pair| pair[0] - pair[1] }
     biggest_bust.delete_if { |percentage| percentage.nan? }
@@ -267,25 +268,24 @@ class StatTracker
   end
 
   def biggest_surprise(season)
-    collect_season_stats(season)
-    preseason_games = teams.map {|team| team.preseason_games}
-    preseason_wins = teams.map {|team| team.preseason_wins}
-    regular_games = teams.map {|team| team.regular_games}
-    regular_wins = teams.map {|team|team.regular_wins}
+    preseason_games = teams.map {|team| team.preseason_games[season]}
+    preseason_wins = teams.map {|team| team.preseason_wins[season]}
+    regular_games = teams.map {|team| team.regular_games[season]}
+    regular_wins = teams.map {|team|team.regular_wins[season]}
     preseason_wins_and_games = preseason_wins.zip(preseason_games)
     regular_wins_and_games = regular_wins.zip(regular_games)
     preseason_win_percentage = preseason_wins_and_games.map do |pair|
       if pair[1] == 0
         0
       else
-        pair[0].to_f / pair[1].to_f
+        pair[0] / pair[1]
       end
     end
     regular_win_percentage = regular_wins_and_games.map do |pair|
       if pair[1] == 0
         0
       else
-        pair[0].to_f / pair[1].to_f
+        pair[0] / pair[1]
       end
     end
     regular_and_preseason_win_percentage = regular_win_percentage.zip(preseason_win_percentage)
@@ -310,7 +310,7 @@ class StatTracker
   end
 
   def season_summary(season, team_id)
-    collect_season_stats(season.to_f)
+    season = season.to_i
     team = ""
     @teams.each do |each_team|
       if each_team.team_id.to_s == team_id
@@ -318,19 +318,18 @@ class StatTracker
       end
     end
 
-    # require 'pry'; binding.pry
-    preseason_win_percentage = (team.preseason_wins.to_f / team.preseason_games.to_f).round(2)
-    regular_win_percentage = (team.regular_wins.to_f / team.regular_games.to_f).round(2)
+    preseason_win_percentage = (team.preseason_wins[season].to_f / team.preseason_games[season].to_f).round(2)
+    regular_win_percentage = (team.regular_wins[season].to_f / team.regular_games[season].to_f).round(2)
 
     preseason_hash = {
       win_percentage: preseason_win_percentage,
-      goals_scored: team.preseason_goals_scored,
-      goals_against: team.preseason_goals_against
+      goals_scored: team.preseason_goals_scored[season],
+      goals_against: team.preseason_goals_against[season]
     }
     regular_hash = {
       win_percentage: regular_win_percentage,
-      goals_scored: team.regular_goals_scored,
-      goals_against: team.regular_goals_against
+      goals_scored: team.regular_goals_scored[season],
+      goals_against: team.regular_goals_against[season]
     }
     {
       preseason: preseason_hash,
@@ -455,21 +454,20 @@ class StatTracker
     end.compact.uniq
     seasonal_summary = {}
     seasons_played.each do |season|
-      collect_season_stats(season)
       seasonal_summary[season] = {
         preseason: {
-          win_percentage: team.preseason_win_percentage,
-          total_goals_scored: team.preseason_goals_scored,
-          total_goals_against: team.preseason_goals_against,
-          average_goals_scored: team.preseason_average_goals_scored,
-          average_goals_against: team.preseason_average_goals_against
+          win_percentage: team.preseason_win_percentage[season],
+          total_goals_scored: team.preseason_goals_scored[season],
+          total_goals_against: team.preseason_goals_against[season],
+          average_goals_scored: team.preseason_average_goals_scored[season],
+          average_goals_against: team.preseason_average_goals_against[season]
         },
         regular_season: {
-          win_percentage: team.regular_win_percentage,
-          total_goals_scored: team.regular_goals_scored,
-          total_goals_against: team.regular_goals_against,
-          average_goals_scored: team.regular_average_goals_scored,
-          average_goals_against: team.regular_average_goals_against
+          win_percentage: team.regular_win_percentage[season],
+          total_goals_scored: team.regular_goals_scored[season],
+          total_goals_against: team.regular_goals_against[season],
+          average_goals_scored: team.regular_average_goals_scored[season],
+          average_goals_against: team.regular_average_goals_against[season]
         }
       }
     end
