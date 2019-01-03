@@ -288,11 +288,10 @@ class StatTrackerTest < Minitest::Test
     stat_tracker = StatTracker.from_csv(@locations)
 
     expected = {
-      wins: 2,
-      losses: 2
+      "Bruins" => 0.5
     }
 
-    assert_equal expected, stat_tracker.head_to_head(3, 6)
+    assert_equal expected, stat_tracker.head_to_head("3")
   end
 
   def test_it_can_collect_league_stats

@@ -312,27 +312,8 @@ class StatTracker
     seasonal_summary
   end
 
-  def head_to_head(team_id_1, team_id_2)
-    hash = {
-      wins: 0,
-      losses: 0
-    }
-    @games.each do |game|
-      if team_id_1 == game.home_team_id && team_id_2 == game.away_team_id
-        if game.home_goals > game.away_goals
-          hash[:wins] += 1
-        elsif game.away_goals > game.home_goals
-          hash[:losses] += 1
-        end
-      elsif team_id_2 == game.home_team_id && team_id_1 == game.away_team_id
-        if game.away_goals > game.home_goals
-          hash[:losses] += 1
-        elsif game.home_goals > game.away_goals
-          hash[:wins] += 1
-        end
-      end
-    end
-    hash
+  def head_to_head(team_id)
+    team_id = team_id.to_i
   end
 
   def best_season(team_id)
