@@ -3,10 +3,12 @@ require_relative './game'
 require_relative './game_teams'
 require_relative './team'
 require_relative './modules/league_stats'
+require_relative './modules/templates'
 
 class StatTracker
 
   include LeagueStats
+  include Templates
 
   attr_reader :games,
               :teams,
@@ -180,45 +182,13 @@ class StatTracker
   # A hash with two keys (:preseason, and :regular_season) each pointing to a hash with the keys :win_percentage, :goals_scored, and :goals_against
   def season_summary(season, team_id)
     season = season.to_i
-    team = ""
-    @teams.each do |each_team|
-      if each_team.team_id.to_s == team_id
-        team = each_team
-      end
-    end
-    preseason_win_percentage = (team.preseason_wins[season].to_f / team.preseason_games[season].to_f).round(2)
-    regular_win_percentage = (team.regular_wins[season].to_f / team.regular_games[season].to_f).round(2)
-
-    preseason_hash = {
-      win_percentage: preseason_win_percentage,
-      goals_scored: team.preseason_goals_scored[season],
-      goals_against: team.preseason_goals_against[season]
-    }
-    regular_hash = {
-      win_percentage: regular_win_percentage,
-      goals_scored: team.regular_goals_scored[season],
-      goals_against: team.regular_goals_against[season]
-    }
-    {
-      preseason: preseason_hash,
-      regular_season: regular_hash
-    }
+    team_id = team_id.to_i
+    season_summary_hash(@teams, season, team_id)
   end
 
   # returns a hash with key/value pairs for each of the attributes of a team
   def team_info(team_id)
-    team_info_hash = {}
-    @teams.each do |team|
-      if team_id.to_i == team.team_id
-        team_info_hash["team_id"] = team.team_id.to_s
-        team_info_hash["franchise_id"] = team.franchise_id.to_s
-        team_info_hash["short_name"] = team.short_name
-        team_info_hash["team_name"] = team.team_name
-        team_info_hash["abbreviation"] = team.abbreviation
-        team_info_hash["link"] = team.link
-      end
-    end
-    team_info_hash
+    team_info_hash(@teams, team_id)
   end
 
   # returns the season with the highest win percentage for a team
@@ -329,35 +299,9 @@ class StatTracker
   # For each season a team has played, returns a hash that has two keys (:preseason, and :regular_season), that each point to a hash with the following keys: :win_percentage, :total_goals_scored, :total_goals_against, :average_goals_scored, :average_goals_against
   def seasonal_summary(team_id)
     team_id = team_id.to_i
-    team = @teams.select { |each_team|  each_team.team_id == team_id }.first
-    seasons_played = @games.map do |game|
-      if game.home_team_id == team_id || game.away_team_id == team_id
-        game.season
-      end
-    end.compact.uniq
-    seasonal_summary = {}
-    seasons_played.each do |season|
-      seasonal_summary[season.to_s] = {
-        preseason: {
-          win_percentage: team.preseason_win_percentage[season].round(2),
-          total_goals_scored: team.preseason_goals_scored[season],
-          total_goals_against: team.preseason_goals_against[season],
-          average_goals_scored: team.preseason_average_goals_scored[season].round(2),
-          average_goals_against: team.preseason_average_goals_against[season].round(2)
-        },
-        regular_season: {
-          win_percentage: team.regular_win_percentage[season].round(2),
-          total_goals_scored: team.regular_goals_scored[season],
-          total_goals_against: team.regular_goals_against[season],
-          average_goals_scored: team.regular_average_goals_scored[season].round(2),
-          average_goals_against: team.regular_average_goals_against[season].round(2)
-        }
-      }
-    end
-    seasonal_summary
+    seasonal_summary_hash(@teams, team_id)
   end
-
-
+  
   def head_to_head(team_id)
     team_id = team_id.to_i
     head_to_head_hash = {}
@@ -396,4 +340,5 @@ class StatTracker
     end
     worst_season.to_s
   end
+
 end
