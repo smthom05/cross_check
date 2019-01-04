@@ -3,11 +3,13 @@ require_relative './game'
 require_relative './game_teams'
 require_relative './team'
 require_relative './modules/league_stats'
+require_relative './modules/season_stats'
 require_relative './modules/templates'
 
 class StatTracker
 
   include LeagueStats
+  include SeasonStats
   include Templates
 
   attr_reader :games,
