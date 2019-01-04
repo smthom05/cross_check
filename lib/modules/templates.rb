@@ -1,7 +1,7 @@
 module Templates
-  def team_info_hash(teams, team_id)
+  def team_info_hash(team_id)
     team_info_hash = {}
-    teams.each do |team|
+    @teams.each do |team|
       if team_id.to_i == team.team_id
         team_info_hash["team_id"] = team.team_id.to_s
         team_info_hash["franchise_id"] = team.franchise_id.to_s
@@ -14,8 +14,8 @@ module Templates
     team_info_hash
   end
 
-  def season_summary_hash(teams, season, team_id)
-    team = teams.select { |each_team| each_team.team_id == team_id }.first
+  def season_summary_hash(season, team_id)
+    team = @teams.select { |each_team| each_team.team_id == team_id }.first
 
     preseason_hash = {
       win_percentage: team.preseason_win_percentage[season].round(2),
@@ -33,8 +33,8 @@ module Templates
     }
   end
 
-  def seasonal_summary_hash(teams, team_id)
-    team = teams.select { |each_team|  each_team.team_id == team_id }.first
+  def seasonal_summary_hash(team_id)
+    team = @teams.select { |each_team|  each_team.team_id == team_id }.first
     seasons_played = @games.map do |game|
       if game.home_team_id == team_id || game.away_team_id == team_id
         game.season
