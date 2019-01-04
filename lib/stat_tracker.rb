@@ -183,12 +183,12 @@ class StatTracker
   def season_summary(season, team_id)
     season = season.to_i
     team_id = team_id.to_i
-    season_summary_hash(@teams, season, team_id)
+    season_summary_hash(season, team_id)
   end
 
   # returns a hash with key/value pairs for each of the attributes of a team
   def team_info(team_id)
-    team_info_hash(@teams, team_id)
+    team_info_hash(team_id)
   end
 
   # returns the season with the highest win percentage for a team
@@ -275,7 +275,7 @@ class StatTracker
   # For each season a team has played, returns a hash that has two keys (:preseason, and :regular_season), that each point to a hash with the following keys: :win_percentage, :total_goals_scored, :total_goals_against, :average_goals_scored, :average_goals_against
   def seasonal_summary(team_id)
     team_id = team_id.to_i
-    seasonal_summary_hash(@teams, team_id)
+    seasonal_summary_hash(team_id)
   end
 
   # returns record (as a hash - win/loss) against each opponent
@@ -284,10 +284,10 @@ class StatTracker
     head_to_head_hash = {}
     team = @teams.select { |each_team| each_team.team_id == team_id }.first
     head_to_head_id_hash = team.matchup_win_percentage
-    head_to_head_id_hash.each do |team_id, win_percentage|
-      @teams.each do |team|
-        if team.team_id == team_id
-          head_to_head_hash[team.team_name] = win_percentage
+    head_to_head_id_hash.each do |each_team_id, win_percentage|
+      @teams.each do |each_team|
+        if each_team.team_id == each_team_id
+          head_to_head_hash[each_team.team_name] = win_percentage
         end
       end
     end
